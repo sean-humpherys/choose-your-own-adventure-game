@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\cidm4390-cyoa-alderaan.csproj" />
+    <ProjectReference Include="..\choose-your-own-adventure-game.csproj" />
   </ItemGroup>
 
 </Project>
