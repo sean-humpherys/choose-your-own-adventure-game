@@ -26,6 +26,14 @@ public class MessagesTests
     }
 
     [TestMethod]
+    public void SetCurrentLanguage_SetsLanguageToItalian()
+    {
+        Messages messages = new Messages();
+        messages.SetCurrentLanguage("Italian");
+        Assert.AreEqual("Italian", messages.CurrentLanguage);
+    }
+
+    [TestMethod]
     public void SetCurrentLanguage_SetsLanguageToEnglish()
     {
         Messages messages = new Messages();
@@ -62,6 +70,16 @@ public class MessagesTests
         messages.ReadDictionary();
         string result = messages.GetMessage("welcome");
         Assert.AreEqual("Bienvenue dans Choisissez Votre Aventure", result);
+    }
+
+    [TestMethod]
+    public void ReadDictionary_LoadsItalianWelcomeMessage()
+    {
+        Messages messages = new Messages();
+        messages.SetCurrentLanguage("Italian");
+        messages.ReadDictionary();
+        string result = messages.GetMessage("welcome");
+        Assert.AreEqual("Benvenuto nel Gioco Scegli la Tua Avventura", result);
     }
 
     [TestMethod]
@@ -105,6 +123,10 @@ public class MessagesTests
         messages.SetCurrentLanguage("French");
         messages.ReadDictionary();
         Assert.AreEqual("Au revoir!", messages.GetMessage("goodbye"));
+
+        messages.SetCurrentLanguage("Italian");
+        messages.ReadDictionary();
+        Assert.AreEqual("Arrivederci!", messages.GetMessage("goodbye"));
     }
 
     [TestMethod]
@@ -158,6 +180,24 @@ public class MessagesTests
         {
             string result = messages.GetMessage(key);
             Assert.AreNotEqual($"[{key}]", result, $"Key '{key}' is missing from French dictionary.");
+        }
+    }
+
+    [TestMethod]
+    public void ReadDictionary_AllRequiredKeysExistInItalian()
+    {
+        Messages messages = new Messages();
+        messages.SetCurrentLanguage("Italian");
+        messages.ReadDictionary();
+
+        string[] requiredKeys = { "welcome", "menu",
+                                   "choose_path", "path_north", "path_south", "attack_prompt",
+                                   "victory", "defeat", "retreat", "invalid", "goodbye" };
+
+        foreach (string key in requiredKeys)
+        {
+            string result = messages.GetMessage(key);
+            Assert.AreNotEqual($"[{key}]", result, $"Key '{key}' is missing from Italian dictionary.");
         }
     }
 
