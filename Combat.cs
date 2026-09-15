@@ -30,18 +30,32 @@ public class Combat
             if (player.HealthPoints <= 0)
                 return false;
 
-            Console.WriteLine(messages.GetMessage("attack_prompt"));
-            string? input = Console.ReadLine()?.Trim().ToLower();
-
-            if (input == "r" || input == "retreat")
+            if (!PromptToContinueAttacking())
             {
                 PlayerRetreated = true;
                 Console.WriteLine(messages.GetMessage("retreat_combat"));
                 return false;
             }
+        }
+    }
+
+    // Keeps asking until the player enters a valid choice, so invalid input never triggers another round.
+    // Returns true to attack again, false to retreat. End of input counts as a retreat so combat can't run on its own.
+    private bool PromptToContinueAttacking()
+    {
+        while (true)
+        {
+            Console.WriteLine(messages.GetMessage("attack_prompt"));
+            string? input = Console.ReadLine()?.Trim().ToLower();
+
+            if (input == null)
+                return false;
 
             if (input == "a" || input == "attack")
-                continue;
+                return true;
+
+            if (input == "r" || input == "retreat")
+                return false;
 
             Console.WriteLine(messages.GetMessage("invalid"));
         }
