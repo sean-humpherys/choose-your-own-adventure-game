@@ -10,6 +10,10 @@ public class Player
     public int Agility { get; set; }
     public int HealthPoints { get; set; }
 
+    // The ceiling healing is capped against, recorded at creation and fixed for the
+    // Adventure. The Dragon has no equivalent and gains none, as CONTEXT.md states.
+    public int MaximumHealthPoints { get; set; }
+
     // Fixed at creation rather than rolled, so no Adventure can begin with a purse
     // too small to matter. Sized to afford one piece of the Merchant's stock, not two.
     public const int StartingGold = 100;
@@ -125,8 +129,9 @@ public class Player
     private void RollHealthPoints(Messages messages, int strengthModifier)
     {
         PromptRoll(messages.GetMessage("roll_health"), messages);
-        HealthPoints = _die.Roll(20) + strengthModifier;
+        SetHealthPointsAtCreation(_die.Roll(20), strengthModifier);
     }
+
 
     private void PromptForNextAction(Messages messages)
     {
@@ -159,7 +164,7 @@ public class Player
         output.Add(messages.GetMessage("stats_occupation") + messages.TranslateOccupationForDisplay(Occupation));
         output.Add(messages.GetMessage("stats_strength") + Strength);
         output.Add(messages.GetMessage("stats_agility") + Agility);
-        output.Add(messages.GetMessage("stats_health") + HealthPoints);
+        output.Add(string.Format(messages.GetMessage("stats_health_of_max"), HealthPoints, MaximumHealthPoints));
         output.Add(messages.GetMessage("stats_gold") + Gold);
 
         if (Weapon != null)
@@ -175,6 +180,17 @@ public class Player
         }
 
         return string.Join(Environment.NewLine, output);
+    }
+
+    // Split from the roll so the arithmetic can be asserted without seeding Die, which is
+    // constructed privately here and cannot be injected. Maximum Health Points is recorded
+    // from the same figure rather than derived later, so a Halfling's subtracted Strength
+    // modifier lowers the ceiling along with the roll: the cap reflects the Character
+    // actually rolled. See docs/adr/0002-healing-as-a-capped-flat-restore-that-costs-the-round.md.
+    public void SetHealthPointsAtCreation(int roll, int strengthModifier)
+    {
+        HealthPoints = roll + strengthModifier;
+        MaximumHealthPoints = HealthPoints;
     }
 
     // The single step every blow aimed at this Character goes through. Armor is the only

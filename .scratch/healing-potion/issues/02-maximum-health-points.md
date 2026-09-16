@@ -14,15 +14,15 @@ Demoable on its own: create a Character, view the sheet, take the north Path, an
 
 **Status:** ready-for-agent
 
-- [ ] The Character records Maximum Health Points at creation, equal to the Health Points rolled there.
-- [ ] Maximum Health Points is unchanged by Damage; only Health Points fall.
-- [ ] A Halfling whose Strength modifier lowers rolled Health Points gets a correspondingly lower maximum.
-- [ ] The character sheet shows the Character's Health Points together with the maximum.
-- [ ] The combat stats display shows the Character's Health Points together with the maximum.
-- [ ] The Dragon's health line is unchanged and shows no maximum.
-- [ ] The Character's health line and the Dragon's are rendered separately rather than through one shared message key.
-- [ ] The blow-by-blow combat narration is unchanged and does not repeat the maximum after every swing.
-- [ ] The new text reads correctly in English, Spanish and French.
-- [ ] Tests assert the maximum is set at creation, survives Damage untouched, and appears in both displays' returned strings.
-- [ ] Tests assert both displays keep their existing Weapon, Armor and Gold content unchanged.
-- [ ] The language parity test passes.
+- [x] The Character records Maximum Health Points at creation, equal to the Health Points rolled there.
+- [x] Maximum Health Points is unchanged by Damage; only Health Points fall.
+- [x] A Halfling whose Strength modifier lowers rolled Health Points gets a correspondingly lower maximum.
+- [x] The character sheet shows the Character's Health Points together with the maximum.
+- [x] The combat stats display shows the Character's Health Points together with the maximum.
+- [x] The Dragon's health line is unchanged and shows no maximum.
+- [x] The Character's health line and the Dragon's are rendered separately rather than through one shared message key.
+- [x] The blow-by-blow combat narration is unchanged and does not repeat the maximum after every swing.
+- [x] The new text reads correctly in English, Spanish and French.
+- [x] Tests assert the maximum is set at creation, survives Damage untouched, and appears in both displays' returned strings.
+- [x] Tests assert both displays keep their existing Weapon, Armor and Gold content unchanged.
+- [x] The language parity test passes.
