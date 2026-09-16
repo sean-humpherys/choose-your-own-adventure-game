@@ -36,6 +36,10 @@ _Avoid_: Class, job, role
 How much Damage a combatant can absorb before being defeated. Reaching zero ends the Adventure in defeat.
 _Avoid_: HP as a prose word, hit points, life, vitality
 
+**Maximum Health Points**:
+The Health Points a Character is created with, fixed for the Adventure. Healing can restore Health Points up to this ceiling and never past it. A Character has one; the Dragon does not.
+_Avoid_: Max HP, full health, starting health
+
 **Strength**:
 The statistic an Attack Roll is measured against. Higher Strength means landing more blows.
 _Avoid_: Power, might
@@ -73,11 +77,15 @@ Worn equipment that grants Damage Reduction. A character carries at most one.
 _Avoid_: Shield, protection, plate
 
 **Magical**:
-The quality of equipment bought from the Merchant, distinguishing it from the starting equipment an Occupation grants. Magical equipment is strictly better.
+The quality of the wares bought from the Merchant, distinguishing them from the starting equipment an Occupation grants. Magical equipment is strictly better than its starting counterpart.
 _Avoid_: Enchanted, legendary, upgraded
 
+**Healing Potion**:
+A Magical ware bought from the Merchant and drunk during combat to restore Health Points, never above Maximum Health Points. A Character carries at most one, and drinking it consumes it.
+_Avoid_: Elixir, remedy, cure, heal as a noun
+
 **Merchant**:
-The Encounter on the south Path who sells one piece of Magical equipment. A player meets the Merchant once per Adventure.
+The Encounter on the south Path who sells one piece of Magical ware: Armor, a Weapon, or a Healing Potion. A player meets the Merchant once per Adventure.
 _Avoid_: Trader, vendor, shopkeeper, shop
 
 **Gold**:
