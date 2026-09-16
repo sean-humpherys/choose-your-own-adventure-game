@@ -186,7 +186,8 @@ public class Game
         string choice = PromptForMerchantChoice(messages);
         string narrative = merchant.ApplyChoice(player, choice, messages);
 
-        // Buying returns nothing to say until tickets 05 and 06 wire it up.
+        // Every answer the prompt can return has something to say; the guard covers only
+        // the unparseable choice the seam refuses to narrate.
         if (narrative.Length > 0)
             Console.WriteLine(narrative);
     }
