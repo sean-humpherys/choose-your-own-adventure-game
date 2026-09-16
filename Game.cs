@@ -145,6 +145,10 @@ public class Game
             case "weapon":
                 return "weapon";
 
+            case "p":
+            case "potion":
+                return "potion";
+
             case "n":
             case "nothing":
                 return "nothing";

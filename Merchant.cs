@@ -1,6 +1,6 @@
 public class Merchant
 {
-    // Both items cost the same, so the choice is about fit rather than budget.
+    // All three wares cost the same, so the choice is about fit rather than budget.
     // Priced against Player.StartingGold to afford exactly one item, never two.
     public const int ItemPrice = 75;
 
@@ -15,6 +15,14 @@ public class Merchant
     // ordering the Occupations set at creation survives: every Occupation's upgrade is
     // worth the same, and a Thief's dagger is not levelled up to a Fighter's sword.
     public const int MagicalDamageIncrement = 6;
+
+    // The single Healing Potion the Merchant stocks. The restore is calibrated in ADR-0002
+    // against the Dragon's claws and what the Armor saves across a fight: 8 is a little over
+    // one average blow. Holding it until well wounded is the right play because the clamp
+    // wastes an early drink and the lost round punishes a safe one, not because of its size.
+    public const string PotionType = "healing potion";
+    public const int PotionHealthPointsRestored = 8;
+    private const string PotionAsciiArt = "(~~~)";
 
     // Only the name and the art vary by Occupation; the Damage is always derived from the
     // Weapon being replaced, so this deliberately is not a Weapon. A Weapon here would need
@@ -42,6 +50,11 @@ public class Merchant
         if (FindMagicalWeaponFor(player) != null)
             output.Add(string.Format(messages.GetMessage("merchant_offer_weapon"), ItemPrice));
 
+        output.Add(string.Format(
+            messages.GetMessage("merchant_offer_potion"),
+            ItemPrice,
+            PotionHealthPointsRestored));
+
         output.Add(string.Format(messages.GetMessage("merchant_your_gold"), player.Gold));
 
         return string.Join(Environment.NewLine, output);
@@ -62,6 +75,9 @@ public class Merchant
             case "armor":
                 return BuyArmor(player, messages);
 
+            case "potion":
+                return BuyPotion(player, messages);
+
             default:
                 return "";
         }
@@ -79,6 +95,22 @@ public class Merchant
             messages.GetMessage("merchant_armor_bought"),
             messages.TranslateArmorForDisplay(player.Armor.Type),
             player.Armor.DamageReduction,
+            player.Gold
+        );
+    }
+
+    private string BuyPotion(Player player, Messages messages)
+    {
+        if (player.Gold < ItemPrice)
+            return messages.GetMessage("merchant_cannot_afford");
+
+        player.Potion = new Potion(PotionType, PotionHealthPointsRestored, PotionAsciiArt);
+        player.Gold -= ItemPrice;
+
+        return string.Format(
+            messages.GetMessage("merchant_potion_bought"),
+            messages.TranslatePotionForDisplay(player.Potion.Type),
+            player.Potion.HealthPointsRestored,
             player.Gold
         );
     }

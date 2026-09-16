@@ -42,6 +42,12 @@ public class LanguageParityTests
         AssertSectionKeysMatchAcrossLanguages("displayArmorMap");
     }
 
+    [TestMethod]
+    public void DisplayPotionMap_HasIdenticalKeysInEveryLanguage()
+    {
+        AssertSectionKeysMatchAcrossLanguages("displayPotionMap");
+    }
+
     // Every key that appears in any language is expected in all of them, so a key
     // added to one language alone fails no matter which language it was added to.
     private static void AssertSectionKeysMatchAcrossLanguages(string section)

@@ -10,6 +10,7 @@ public class Messages
     private Dictionary<string, string> _displayOccupationMap;
     private Dictionary<string, string> _displayWeaponMap;
     private Dictionary<string, string> _displayArmorMap;
+    private Dictionary<string, string> _displayPotionMap;
 
     public Messages()
     {
@@ -59,6 +60,10 @@ public class Messages
         _displayArmorMap = new Dictionary<string, string>();
         foreach (JsonProperty entry in langSection.GetProperty("displayArmorMap").EnumerateObject())
             _displayArmorMap[entry.Name] = entry.Value.GetString() ?? string.Empty;
+
+        _displayPotionMap = new Dictionary<string, string>();
+        foreach (JsonProperty entry in langSection.GetProperty("displayPotionMap").EnumerateObject())
+            _displayPotionMap[entry.Name] = entry.Value.GetString() ?? string.Empty;
     }
 
     public string GetMessage(string key)
@@ -101,6 +106,11 @@ public class Messages
     public string TranslateWeaponForDisplay(string weaponType)
     {
         return _displayWeaponMap.TryGetValue(weaponType, out string? translated) ? translated : weaponType;
+    }
+
+    public string TranslatePotionForDisplay(string potionType)
+    {
+        return _displayPotionMap.TryGetValue(potionType, out string? translated) ? translated : potionType;
     }
 
     public string TranslateArmorForDisplay(string armorType)

@@ -116,6 +116,12 @@ public class Combat
             output.Add(messages.GetMessage("stats_damage_reduction") + player.Armor.DamageReduction);
         }
 
+        if (player.Potion != null)
+        {
+            output.Add(messages.GetMessage("stats_potion") + messages.TranslatePotionForDisplay(player.Potion.Type));
+            output.Add(messages.GetMessage("stats_potion_restores") + player.Potion.HealthPointsRestored);
+        }
+
         output.Add("");
         output.Add(messages.GetMessage("combat_dragon_header"));
         output.Add(messages.GetMessage("stats_name") + dragon.Name);

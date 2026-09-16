@@ -24,6 +24,8 @@ public class Player
 
     public Armor? Armor { get; set; }
 
+    public Potion? Potion { get; set; }
+
     public void CreateCharacter(Messages messages)
     {
         Race = PromptForRace(messages);
@@ -177,6 +179,12 @@ public class Player
         {
             output.Add(messages.GetMessage("stats_armor") + messages.TranslateArmorForDisplay(Armor.Type));
             output.Add(messages.GetMessage("stats_damage_reduction") + Armor.DamageReduction);
+        }
+
+        if (Potion != null)
+        {
+            output.Add(messages.GetMessage("stats_potion") + messages.TranslatePotionForDisplay(Potion.Type));
+            output.Add(messages.GetMessage("stats_potion_restores") + Potion.HealthPointsRestored);
         }
 
         return string.Join(Environment.NewLine, output);
