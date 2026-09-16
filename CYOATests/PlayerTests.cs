@@ -44,6 +44,44 @@ public class PlayerTests
         Assert.IsNull(player.Weapon);
     }
 
+    // The amount is written out rather than read from Player.StartingGold: comparing the
+    // constant with itself could never fail. Retuning the purse updates this line too, on purpose.
+    [TestMethod]
+    public void NewPlayer_CarriesTheFixedStartingGold()
+    {
+        Player player = new Player();
+
+        Assert.AreEqual(100, player.Gold);
+    }
+
+    [TestMethod]
+    [DataRow("English")]
+    [DataRow("Spanish")]
+    [DataRow("French")]
+    public void GetStatsDisplay_IncludesGoldLine(string language)
+    {
+        Player player = CreateTestPlayer();
+        Messages messages = CreateMessages(language);
+
+        string result = player.GetStatsDisplay(messages);
+
+        string label = messages.GetMessage("stats_gold");
+        Assert.AreNotEqual("[stats_gold]", label, $"'stats_gold' is missing from the {language} dictionary.");
+        StringAssert.Contains(result, label + player.Gold, $"The {language} character sheet is missing its Gold line.");
+    }
+
+    [TestMethod]
+    public void GetStatsDisplay_IncludesGoldLine_EvenWithNoWeaponCarried()
+    {
+        Player player = CreateTestPlayer();
+        player.Weapon = null;
+        Messages messages = CreateEnglishMessages();
+
+        string result = player.GetStatsDisplay(messages);
+
+        StringAssert.Contains(result, messages.GetMessage("stats_gold") + player.Gold);
+    }
+
     [TestMethod]
     public void GetStatsDisplay_ReturnsNonEmptyString()
     {

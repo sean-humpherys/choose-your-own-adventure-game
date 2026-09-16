@@ -10,6 +10,12 @@ public class Player
     public int Agility { get; set; }
     public int HealthPoints { get; set; }
 
+    // Fixed at creation rather than rolled, so no Adventure can begin with a purse
+    // too small to matter. Sized to afford one piece of the Merchant's stock, not two.
+    public const int StartingGold = 100;
+
+    public int Gold { get; set; } = StartingGold;
+
     public Weapon? Weapon { get; set; }
 
     public void CreateCharacter(Messages messages)
@@ -152,6 +158,7 @@ public class Player
         output.Add(messages.GetMessage("stats_strength") + Strength);
         output.Add(messages.GetMessage("stats_agility") + Agility);
         output.Add(messages.GetMessage("stats_health") + HealthPoints);
+        output.Add(messages.GetMessage("stats_gold") + Gold);
 
         if (Weapon != null)
         {
