@@ -24,8 +24,16 @@ public class Combat
 
         while (true)
         {
-            if (action == CombatAction.Attack)
-                PlayerAttacksDragonSequence();
+            switch (action)
+            {
+                case CombatAction.Attack:
+                    PlayerAttacksDragonSequence();
+                    break;
+
+                case CombatAction.Drink:
+                    PlayerDrinksPotionSequence();
+                    break;
+            }
 
             if (dragon.HealthPoints <= 0)
                 return true;
@@ -53,7 +61,7 @@ public class Combat
     {
         while (true)
         {
-            Console.WriteLine(messages.GetMessage("attack_prompt"));
+            Console.WriteLine(GetPromptText());
 
             string? input = Console.ReadLine();
 
@@ -65,11 +73,33 @@ public class Combat
 
             CombatAction? action = ParseCombatChoice(input);
 
-            if (action != null)
-                return action.Value;
+            if (action == null)
+            {
+                Console.WriteLine(messages.GetMessage("invalid"));
+                continue;
+            }
 
-            Console.WriteLine(messages.GetMessage("invalid"));
+            // A drink the Character cannot take costs nothing: the refusal is narrated and
+            // the prompt asks again, rather than the round being spent on nothing. The
+            // Character owns both refusals, so the reason is its to state, not the fight's.
+            if (action == CombatAction.Drink && !player.CanDrinkPotion())
+            {
+                Console.WriteLine(player.DrinkPotion(messages));
+                continue;
+            }
+
+            return action.Value;
         }
+    }
+
+    // The drink is offered only to a Character carrying a Potion, following the Merchant's
+    // precedent of not offering a Magical Weapon to a Character with nothing to better.
+    // The prompt for a Character carrying none is the one the fight has always used.
+    public string GetPromptText()
+    {
+        return player.Potion != null
+            ? messages.GetMessage("attack_prompt_with_potion")
+            : messages.GetMessage("attack_prompt");
     }
 
     // The one place the combat prompt's accepted spellings live. Game.IsValidCombatChoice
@@ -85,6 +115,10 @@ public class Combat
             case "a":
             case "attack":
                 return CombatAction.Attack;
+            case "d":
+            case "drink":
+                return CombatAction.Drink;
+
             case "r":
             case "retreat":
                 return CombatAction.Retreat;
@@ -137,6 +171,12 @@ public class Combat
     public void PlayerAttacksDragonSequence()
     {
         Console.WriteLine(player.Attack(dragon, messages));
+    }
+
+    // Drinking replaces the attack for the round; the Dragon still takes its turn below.
+    public void PlayerDrinksPotionSequence()
+    {
+        Console.WriteLine(player.DrinkPotion(messages));
     }
 
     public void DragonAttacksPlayerSequence()

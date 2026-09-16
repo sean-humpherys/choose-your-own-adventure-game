@@ -16,19 +16,19 @@ Read `docs/adr/0002-*` from ticket 01 first. The clamp is the rule it protects: 
 
 **Status:** ready-for-agent
 
-- [ ] Drinking is offered at the combat prompt, alongside attack and retreat, accepted as a single letter or the full word, trimmed and case-insensitive, through the existing pure validator.
-- [ ] Drinking is not offered at the prompt before combat begins, which still offers only attack and retreat.
-- [ ] The drink option is absent from the prompt text when no Potion is carried.
-- [ ] Drinking restores a flat amount of Health Points and consumes the Potion.
-- [ ] The restore never raises Health Points above Maximum Health Points.
-- [ ] A Character wounded by less than the restore returns to exactly Maximum Health Points and never exceeds it.
-- [ ] Drinking replaces the Character's attack for that round, and the Dragon still takes its turn.
-- [ ] Drinking at Maximum Health Points is refused, the Potion is kept, Health Points are unchanged, and the prompt re-prompts.
-- [ ] Typing the drink option while carrying no Potion re-prompts and does not cost a round.
-- [ ] The narrative states the amount restored and the resulting Health Points.
-- [ ] The narratives for a successful drink, a refusal at full health, and having no Potion are distinct, so the player can tell the three apart.
-- [ ] All new text reads correctly in English, Spanish and French, and the language parity test passes.
-- [ ] The healing arithmetic lives behind a single method on the Character that returns its narrative, so it is asserted without driving the Console.
-- [ ] Tests assert the restore across its boundaries: wounded by more than the restore, by exactly the restore, and by less than it.
-- [ ] Tests assert a successful drink clears the Potion, and that both refusals leave the Potion and Health Points untouched.
-- [ ] The existing combat tests pass unchanged.
+- [x] Drinking is offered at the combat prompt, alongside attack and retreat, accepted as a single letter or the full word, trimmed and case-insensitive, through the existing pure validator.
+- [x] Drinking is not offered at the prompt before combat begins, which still offers only attack and retreat.
+- [x] The drink option is absent from the prompt text when no Potion is carried.
+- [x] Drinking restores a flat amount of Health Points and consumes the Potion.
+- [x] The restore never raises Health Points above Maximum Health Points.
+- [x] A Character wounded by less than the restore returns to exactly Maximum Health Points and never exceeds it.
+- [x] Drinking replaces the Character's attack for that round, and the Dragon still takes its turn.
+- [x] Drinking at Maximum Health Points is refused, the Potion is kept, Health Points are unchanged, and the prompt re-prompts.
+- [x] Typing the drink option while carrying no Potion re-prompts and does not cost a round.
+- [x] The narrative states the amount restored and the resulting Health Points.
+- [x] The narratives for a successful drink, a refusal at full health, and having no Potion are distinct, so the player can tell the three apart.
+- [x] All new text reads correctly in English, Spanish and French, and the language parity test passes.
+- [x] The healing arithmetic lives behind a single method on the Character that returns its narrative, so it is asserted without driving the Console.
+- [x] Tests assert the restore across its boundaries: wounded by more than the restore, by exactly the restore, and by less than it.
+- [x] Tests assert a successful drink clears the Potion, and that both refusals leave the Potion and Health Points untouched.
+- [x] The existing combat tests pass unchanged.

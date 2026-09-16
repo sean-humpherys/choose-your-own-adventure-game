@@ -201,6 +201,56 @@ public class Player
         MaximumHealthPoints = HealthPoints;
     }
 
+    // Whether the round may be spent on a drink at all. The prompt asks before offering the
+    // option and before spending a round on it, and DrinkPotion refuses off this same answer,
+    // so the two rules are stated once and a caller that forgets to ask is still refused.
+    public bool CanDrinkPotion()
+    {
+        return Potion != null && HealthPoints < MaximumHealthPoints;
+    }
+
+    // The one place Health Points are raised. The restore is flat and clamped at Maximum
+    // Health Points, so the Potion can never make a Character stronger than the one rolled
+    // at creation; any future source of healing must come through here or the ceiling
+    // silently stops working for it, as recorded in
+    // docs/adr/0002-healing-as-a-capped-flat-restore-that-costs-the-round.md.
+    //
+    // It owns both refusals as well, returning their narrative and leaving the Character
+    // untouched, so the fight has no healing arithmetic of its own to get wrong. The
+    // narrative is returned rather than printed, the way the attack methods return theirs.
+    public string DrinkPotion(Messages messages)
+    {
+        if (!CanDrinkPotion())
+            return Potion == null
+                ? string.Format(messages.GetMessage("potion_none_carried"), Name)
+                : string.Format(messages.GetMessage("potion_refused_at_maximum"), Name, MaximumHealthPoints);
+
+        int restored = Math.Min(Potion.HealthPointsRestored, MaximumHealthPoints - HealthPoints);
+        HealthPoints += restored;
+
+        var output = new List<string>();
+
+        output.Add(string.Format(
+            messages.GetMessage("potion_drunk"),
+            Name,
+            messages.TranslatePotionForDisplay(Potion.Type)
+        ));
+
+        if (!string.IsNullOrWhiteSpace(Potion.AsciiArt))
+            output.Add(Potion.AsciiArt);
+
+        output.Add(string.Format(
+            messages.GetMessage("potion_restored"),
+            restored,
+            HealthPoints,
+            MaximumHealthPoints
+        ));
+
+        Potion = null;
+
+        return string.Join(Environment.NewLine, output);
+    }
+
     // The single step every blow aimed at this Character goes through. Armor is the only
     // source of Damage Reduction, and the result floors at zero so a blow can never heal.
     // Any future source of Damage must route through here or Armor stops working for it,

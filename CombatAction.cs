@@ -4,5 +4,6 @@
 public enum CombatAction
 {
     Attack,
+    Drink,
     Retreat
 }
