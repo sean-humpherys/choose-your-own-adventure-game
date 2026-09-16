@@ -68,6 +68,10 @@ _Avoid_: Protection, defense, armor class, mitigation, absorption
 
 ### Equipment and trade
 
+**Equipment**:
+Everything a Character carries to use: one Weapon, at most one Armor, and at most one Healing Potion. Gold is not Equipment. It is what Equipment is bought with.
+_Avoid_: Inventory, items, gear, belongings, pack
+
 **Weapon**:
 The single armament a character attacks with. A character carries exactly one; acquiring another replaces it.
 _Avoid_: Arm, gear, item
