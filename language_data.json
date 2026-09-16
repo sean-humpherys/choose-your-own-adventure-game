@@ -47,6 +47,9 @@
       "merchant_prompt": "What will you have? Enter 'a' for the Armor, 'w' for the Weapon, or 'n' for nothing.",
       "merchant_invalid": "The Merchant frowns. Enter 'a', 'w', or 'n'.",
       "merchant_declined": "'Nothing, then.' The Merchant shrugs, leads his cart away down the road, and is gone. You keep your Gold and return to the fork.",
+      "merchant_weapon_bought": "The Merchant unwraps it and puts it in your hands: a {0}, worth {1} Damage at its best. You have {2} Gold left. 'Use it well,' he says, and takes his cart away down the road.",
+      "merchant_cannot_afford": "The Merchant weighs your purse in his hand and gives it back. 'Not enough, friend. Come again when the road has been kinder.'",
+      "merchant_no_weapon_to_better": "'You carry nothing I could better,' says the Merchant. 'The Armor, then, or nothing at all.'",
       "south_path_empty": "You take the South path again. The clearing is empty, the cart tracks already fading. The Merchant has moved on.",
       "north_path_narrative": "You take the North path. After walking for hours, the air grows colder, and the trees become more sparse. You are confronted with a dragon. The dragon has a hoard of gold behind it.",
       "dragon_intro": "The dragon says 'I am {0}. Leave or perish!'",
@@ -109,7 +112,11 @@
       "lightning bolt spell": "lightning bolt spell",
       "dagger": "dagger",
       "long bow": "long bow",
-      "claws": "claws"
+      "claws": "claws",
+      "runed long sword": "runed long sword",
+      "chain lightning spell": "chain lightning spell",
+      "shadowfang dagger": "shadowfang dagger",
+      "windsong long bow": "windsong long bow"
     }
   },
   "Spanish": {
@@ -160,6 +167,9 @@
       "merchant_prompt": "Que eliges? Escribe 'a' para la Armadura, 'w' para el Arma, o 'n' para nada.",
       "merchant_invalid": "El Mercader frunce el ceno. Escribe 'a', 'w' o 'n'.",
       "merchant_declined": "'Nada, entonces.' El Mercader se encoge de hombros, se lleva su carreta camino abajo, y desaparece. Conservas tu Oro y vuelves a la bifurcacion.",
+      "merchant_weapon_bought": "El Mercader la desenvuelve y te la pone en las manos: un {0}, que causa hasta {1} de Dano. Te quedan {2} de Oro. 'Usala bien', dice, y se lleva su carreta camino abajo.",
+      "merchant_cannot_afford": "El Mercader sopesa tu bolsa en la mano y te la devuelve. 'No alcanza, amigo. Vuelve cuando el camino haya sido mas generoso.'",
+      "merchant_no_weapon_to_better": "'No llevas nada que yo pueda mejorar', dice el Mercader. 'La Armadura, entonces, o nada.'",
       "south_path_empty": "Tomas el camino del sur otra vez. El claro esta vacio y las huellas de la carreta ya se borran. El Mercader se ha marchado.",
       "north_path_narrative": "Tomas el camino del norte. Despues de caminar durante horas, el aire se vuelve mas frio y los arboles mas escasos. Te enfrentas a un dragon. El dragon tiene una horda de oro detras de el.",
       "dragon_intro": "El dragon dice 'Soy {0}. Vete o perece!'",
@@ -222,7 +232,11 @@
       "lightning bolt spell": "hechizo de rayo",
       "dagger": "daga",
       "long bow": "arco largo",
-      "claws": "garras"
+      "claws": "garras",
+      "runed long sword": "espada larga runica",
+      "chain lightning spell": "hechizo de rayo encadenado",
+      "shadowfang dagger": "daga colmillo de sombra",
+      "windsong long bow": "arco largo cantoviento"
     }
   },
   "French": {
@@ -267,12 +281,15 @@
       "path_invalid": "Choix invalide. Veuillez taper 'n', 's' ou 'e'.",
       "south_path_narrative": "Vous prenez le chemin du sud. Les bois s'ouvrent sur une clairiere, et un Marchand attend pres d'une charrette chargee, comme s'il vous attendait.",
       "merchant_greeting": "Le Marchand ouvre les mains. 'Bien le bonjour, voyageur. La montagne est dure aux mal equipes. J'ai deux choses qui valent votre Or.'",
-      "merchant_offer_armor": "  Armure Magique - {0} d'Or. Elle accorde une Reduction de Degats: un montant fixe retire de chaque coup qui porte.",
+      "merchant_offer_armor": "  Armure Magique - {0} d'Or. Elle accorde une Reduction de Dommages: un montant fixe retire de chaque coup qui porte.",
       "merchant_offer_weapon": "  Une Arme Magique - {0} d'Or. Adaptee a votre metier, et plus mortelle que la votre.",
       "merchant_your_gold": "Vous portez {0} d'Or. De quoi en prendre une, pas les deux.",
       "merchant_prompt": "Que prenez-vous? Entrez 'a' pour l'Armure, 'w' pour l'Arme, ou 'n' pour rien.",
       "merchant_invalid": "Le Marchand fronce les sourcils. Entrez 'a', 'w' ou 'n'.",
       "merchant_declined": "'Rien, donc.' Le Marchand hausse les epaules, emmene sa charrette sur la route, et disparait. Vous gardez votre Or et revenez a la bifurcation.",
+      "merchant_weapon_bought": "Le Marchand la deballe et vous la met en main: un {0}, qui inflige jusqu'a {1} de Dommages. Il vous reste {2} d'Or. 'Servez-vous-en bien', dit-il, et il emmene sa charrette sur la route.",
+      "merchant_cannot_afford": "Le Marchand soupese votre bourse et vous la rend. 'Pas assez, l'ami. Revenez quand la route aura ete plus clemente.'",
+      "merchant_no_weapon_to_better": "'Vous ne portez rien que je puisse ameliorer', dit le Marchand. 'L'Armure, alors, ou rien du tout.'",
       "south_path_empty": "Vous reprenez le chemin du sud. La clairiere est vide, les traces de la charrette s'effacent deja. Le Marchand est parti.",
       "north_path_narrative": "Vous prenez le chemin du nord. Apres avoir marche pendant des heures, l'air devient plus froid et les arbres plus rares. Vous etes confronte a un dragon. Le dragon a un tresor d'or derriere lui.",
       "dragon_intro": "Le dragon dit 'Je suis {0}. Pars ou peris !'",
@@ -335,7 +352,11 @@
       "lightning bolt spell": "sort d'eclair",
       "dagger": "dague",
       "long bow": "arc long",
-      "claws": "griffes"
+      "claws": "griffes",
+      "runed long sword": "epee longue runique",
+      "chain lightning spell": "sort d'eclair enchaine",
+      "shadowfang dagger": "dague croc d'ombre",
+      "windsong long bow": "arc long chantevent"
     }
   }
 }
