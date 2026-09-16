@@ -176,7 +176,7 @@ public class Game
         }
     }
 
-    public void HandleMerchantEncounter(Player player, Messages messages)
+    private void HandleMerchantEncounter(Player player, Messages messages)
     {
         Merchant merchant = new Merchant();
 
