@@ -117,12 +117,11 @@ public class Game
                trimmed == "e" || trimmed == "exit";
     }
 
+    // Answers off Combat's parser rather than repeating the spellings, so the validator and
+    // the round loop cannot drift apart, exactly as IsValidMerchantChoice does below.
     public bool IsValidCombatChoice(string? input)
     {
-        if (string.IsNullOrWhiteSpace(input)) return false;
-        string trimmed = input.Trim().ToLower();
-        return trimmed == "a" || trimmed == "attack" ||
-               trimmed == "r" || trimmed == "retreat";
+        return Combat.ParseCombatChoice(input) != null;
     }
 
     public bool IsValidMerchantChoice(string? input)

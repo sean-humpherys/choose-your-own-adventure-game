@@ -12,10 +12,10 @@ This is the one place the feature touches existing control flow, so the guard is
 
 **Status:** ready-for-agent
 
-- [ ] The round performs an action carried from the previous prompt rather than a hard-coded attack.
-- [ ] The opening round still attacks, with no prompt shown before the first blow.
-- [ ] The Dragon's turn and both defeat checks stay in their current positions in the round.
-- [ ] Retreat ends the fight exactly as it does today, with the same narrative.
-- [ ] An unrecognised answer still re-prompts without advancing the round.
-- [ ] No player-facing text changes in any of the three languages.
-- [ ] The existing combat tests pass unchanged, with no edits to their assertions.
+- [x] The round performs an action carried from the previous prompt rather than a hard-coded attack.
+- [x] The opening round still attacks, with no prompt shown before the first blow.
+- [x] The Dragon's turn and both defeat checks stay in their current positions in the round.
+- [x] Retreat ends the fight exactly as it does today, with the same narrative.
+- [x] An unrecognised answer still re-prompts without advancing the round.
+- [x] No player-facing text changes in any of the three languages.
+- [x] The existing combat tests pass unchanged, with no edits to their assertions.
