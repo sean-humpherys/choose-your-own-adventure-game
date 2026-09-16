@@ -18,9 +18,22 @@ public class Combat
     {
         Console.WriteLine(GetCombatStatsDisplay());
 
+        // The opening round attacks without asking: the fight was entered by choosing to
+        // attack at the Encounter, and each prompt then chooses the following round's action.
+        CombatAction action = CombatAction.Attack;
+
         while (true)
         {
-            PlayerAttacksDragonSequence();
+            switch (action)
+            {
+                case CombatAction.Attack:
+                    PlayerAttacksDragonSequence();
+                    break;
+
+                case CombatAction.Drink:
+                    PlayerDrinksPotionSequence();
+                    break;
+            }
 
             if (dragon.HealthPoints <= 0)
                 return true;
@@ -30,20 +43,87 @@ public class Combat
             if (player.HealthPoints <= 0)
                 return false;
 
-            Console.WriteLine(messages.GetMessage("attack_prompt"));
-            string? input = Console.ReadLine()?.Trim().ToLower();
+            action = PromptForAction();
 
-            if (input == "r" || input == "retreat")
+            if (action == CombatAction.Retreat)
             {
                 PlayerRetreated = true;
                 Console.WriteLine(messages.GetMessage("retreat_combat"));
                 return false;
             }
+        }
+    }
 
-            if (input == "a" || input == "attack")
+    // Asks until the answer is one it recognises, so a slip costs nothing. Returning the
+    // action rather than acting on it keeps this the thing that prompts and prints, and
+    // lets the round decide what to do with the answer.
+    private CombatAction PromptForAction()
+    {
+        while (true)
+        {
+            Console.WriteLine(GetPromptText());
+
+            string? input = Console.ReadLine();
+
+            // End of input, so there is no one left to re-prompt and asking again would
+            // spin forever. Retreating is the outcome that ends the fight without further
+            // harm, so it is the safe one, as Game.PromptForMerchantChoice does with null.
+            if (input == null)
+                return CombatAction.Retreat;
+
+            CombatAction? action = ParseCombatChoice(input);
+
+            if (action == null)
+            {
+                Console.WriteLine(messages.GetMessage("invalid"));
                 continue;
+            }
 
-            Console.WriteLine(messages.GetMessage("invalid"));
+            // A drink the Character cannot take costs nothing: the refusal is narrated and
+            // the prompt asks again, rather than the round being spent on nothing. The
+            // Character owns both refusals, so the reason is its to state, not the fight's.
+            if (action == CombatAction.Drink && !player.CanDrinkPotion())
+            {
+                Console.WriteLine(player.DrinkPotion(messages));
+                continue;
+            }
+
+            return action.Value;
+        }
+    }
+
+    // The drink is offered only to a Character carrying a Potion, following the Merchant's
+    // precedent of not offering a Magical Weapon to a Character with nothing to better.
+    // The prompt for a Character carrying none is the one the fight has always used.
+    public string GetPromptText()
+    {
+        return player.Potion != null
+            ? messages.GetMessage("attack_prompt_with_potion")
+            : messages.GetMessage("attack_prompt");
+    }
+
+    // The one place the combat prompt's accepted spellings live. Game.IsValidCombatChoice
+    // answers off this same list, so a spelling can never be accepted by the validator and
+    // go unrecognised by the round, the way Merchant choices are parsed and validated once.
+    public static CombatAction? ParseCombatChoice(string? input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+            return null;
+
+        switch (input.Trim().ToLower())
+        {
+            case "a":
+            case "attack":
+                return CombatAction.Attack;
+            case "d":
+            case "drink":
+                return CombatAction.Drink;
+
+            case "r":
+            case "retreat":
+                return CombatAction.Retreat;
+            default:
+                return null;
         }
     }
 
@@ -56,12 +136,24 @@ public class Combat
         output.Add(messages.GetMessage("stats_name") + player.Name);
         output.Add(messages.GetMessage("stats_strength") + player.Strength);
         output.Add(messages.GetMessage("stats_agility") + player.Agility);
-        output.Add(messages.GetMessage("stats_health") + player.HealthPoints);
+        output.Add(string.Format(messages.GetMessage("stats_health_of_max"), player.HealthPoints, player.MaximumHealthPoints));
 
         if (player.Weapon != null)
         {
             output.Add(messages.GetMessage("stats_weapon") + messages.TranslateWeaponForDisplay(player.Weapon.Type));
             output.Add(messages.GetMessage("stats_damage") + player.Weapon.MaxDamage);
+        }
+
+        if (player.Armor != null)
+        {
+            output.Add(messages.GetMessage("stats_armor") + messages.TranslateArmorForDisplay(player.Armor.Type));
+            output.Add(messages.GetMessage("stats_damage_reduction") + player.Armor.DamageReduction);
+        }
+
+        if (player.Potion != null)
+        {
+            output.Add(messages.GetMessage("stats_potion") + messages.TranslatePotionForDisplay(player.Potion.Type));
+            output.Add(messages.GetMessage("stats_potion_restores") + player.Potion.HealthPointsRestored);
         }
 
         output.Add("");
@@ -79,6 +171,12 @@ public class Combat
     public void PlayerAttacksDragonSequence()
     {
         Console.WriteLine(player.Attack(dragon, messages));
+    }
+
+    // Drinking replaces the attack for the round; the Dragon still takes its turn below.
+    public void PlayerDrinksPotionSequence()
+    {
+        Console.WriteLine(player.DrinkPotion(messages));
     }
 
     public void DragonAttacksPlayerSequence()

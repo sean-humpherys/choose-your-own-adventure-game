@@ -42,6 +42,11 @@ public class Game
                 Player player = new Player();
                 player.CreateCharacter(messages);
 
+                // Tripped when the Merchant is met, not when something is bought, so
+                // declining consumes the visit. Scoped to the Adventure, so a new
+                // Character meets him afresh.
+                bool merchantMet = false;
+
                 bool inAdventureMenu = true;
                 while (inAdventureMenu)
                 {
@@ -55,7 +60,15 @@ public class Game
                     }
                     else if (selectedPath == "south")
                     {
-                        Console.WriteLine(messages.GetMessage("south_path_narrative"));
+                        if (merchantMet)
+                        {
+                            Console.WriteLine(messages.GetMessage("south_path_empty"));
+                        }
+                        else
+                        {
+                            HandleMerchantEncounter(player, messages);
+                            merchantMet = true;
+                        }
                     }
                     else if (selectedPath == "north")
                     {
@@ -104,12 +117,45 @@ public class Game
                trimmed == "e" || trimmed == "exit";
     }
 
+    // Answers off Combat's parser rather than repeating the spellings, so the validator and
+    // the round loop cannot drift apart, exactly as IsValidMerchantChoice does below.
     public bool IsValidCombatChoice(string? input)
     {
-        if (string.IsNullOrWhiteSpace(input)) return false;
-        string trimmed = input.Trim().ToLower();
-        return trimmed == "a" || trimmed == "attack" ||
-               trimmed == "r" || trimmed == "retreat";
+        return Combat.ParseCombatChoice(input) != null;
+    }
+
+    public bool IsValidMerchantChoice(string? input)
+    {
+        return ParseMerchantChoice(input) != null;
+    }
+
+    // The one place the accepted spellings live. Validating and parsing off the same
+    // list means a spelling can never be accepted by one and unrecognised by the other.
+    private string? ParseMerchantChoice(string? input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return null;
+
+        switch (input.Trim().ToLower())
+        {
+            case "a":
+            case "armor":
+                return "armor";
+
+            case "w":
+            case "weapon":
+                return "weapon";
+
+            case "p":
+            case "potion":
+                return "potion";
+
+            case "n":
+            case "nothing":
+                return "nothing";
+
+            default:
+                return null;
+        }
     }
 
     private string PromptForPath(Messages messages)
@@ -130,6 +176,44 @@ public class Game
                 return "exit";
 
             Console.WriteLine(messages.GetMessage("path_invalid"));
+        }
+    }
+
+    private void HandleMerchantEncounter(Player player, Messages messages)
+    {
+        Merchant merchant = new Merchant();
+
+        Console.WriteLine(messages.GetMessage("south_path_narrative"));
+        Console.WriteLine(merchant.GetOffer(player, messages));
+
+        string choice = PromptForMerchantChoice(messages);
+        string narrative = merchant.ApplyChoice(player, choice, messages);
+
+        // Every answer the prompt can return has something to say; the guard covers only
+        // the unparseable choice the seam refuses to narrate.
+        if (narrative.Length > 0)
+            Console.WriteLine(narrative);
+    }
+
+    private string PromptForMerchantChoice(Messages messages)
+    {
+        while (true)
+        {
+            Console.WriteLine(messages.GetMessage("merchant_prompt"));
+            Console.Write(messages.GetMessage("enter_choice"));
+            string? input = Console.ReadLine();
+
+            // End of input, so there is no one left to re-prompt. Declining is the
+            // outcome that leaves the Character untouched, so it is the safe one.
+            if (input == null)
+                return "nothing";
+
+            string? choice = ParseMerchantChoice(input);
+
+            if (choice != null)
+                return choice;
+
+            Console.WriteLine(messages.GetMessage("merchant_invalid"));
         }
     }
 

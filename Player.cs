@@ -10,7 +10,21 @@ public class Player
     public int Agility { get; set; }
     public int HealthPoints { get; set; }
 
+    // The ceiling healing is capped against, recorded at creation and fixed for the
+    // Adventure. The Dragon has no equivalent and gains none, as CONTEXT.md states.
+    public int MaximumHealthPoints { get; set; }
+
+    // Fixed at creation rather than rolled, so no Adventure can begin with a purse
+    // too small to matter. Sized to afford one piece of the Merchant's stock, not two.
+    public const int StartingGold = 100;
+
+    public int Gold { get; set; } = StartingGold;
+
     public Weapon? Weapon { get; set; }
+
+    public Armor? Armor { get; set; }
+
+    public Potion? Potion { get; set; }
 
     public void CreateCharacter(Messages messages)
     {
@@ -117,8 +131,9 @@ public class Player
     private void RollHealthPoints(Messages messages, int strengthModifier)
     {
         PromptRoll(messages.GetMessage("roll_health"), messages);
-        HealthPoints = _die.Roll(20) + strengthModifier;
+        SetHealthPointsAtCreation(_die.Roll(20), strengthModifier);
     }
+
 
     private void PromptForNextAction(Messages messages)
     {
@@ -138,19 +153,116 @@ public class Player
 
     public void DisplayStats(Messages messages)
     {
-        Console.WriteLine(messages.GetMessage("stats_header"));
-        Console.WriteLine(messages.GetMessage("stats_name") + Name);
-        Console.WriteLine(messages.GetMessage("stats_race") + messages.TranslateRaceForDisplay(Race));
-        Console.WriteLine(messages.GetMessage("stats_occupation") + messages.TranslateOccupationForDisplay(Occupation));
-        Console.WriteLine(messages.GetMessage("stats_strength") + Strength);
-        Console.WriteLine(messages.GetMessage("stats_agility") + Agility);
-        Console.WriteLine(messages.GetMessage("stats_health") + HealthPoints);
+        Console.WriteLine(GetStatsDisplay(messages));
+    }
+
+    public string GetStatsDisplay(Messages messages)
+    {
+        var output = new List<string>();
+
+        output.Add(messages.GetMessage("stats_header"));
+        output.Add(messages.GetMessage("stats_name") + Name);
+        output.Add(messages.GetMessage("stats_race") + messages.TranslateRaceForDisplay(Race));
+        output.Add(messages.GetMessage("stats_occupation") + messages.TranslateOccupationForDisplay(Occupation));
+        output.Add(messages.GetMessage("stats_strength") + Strength);
+        output.Add(messages.GetMessage("stats_agility") + Agility);
+        output.Add(string.Format(messages.GetMessage("stats_health_of_max"), HealthPoints, MaximumHealthPoints));
+        output.Add(messages.GetMessage("stats_gold") + Gold);
 
         if (Weapon != null)
         {
-            Console.WriteLine(messages.GetMessage("stats_weapon") + messages.TranslateWeaponForDisplay(Weapon.Type));
-            Console.WriteLine(messages.GetMessage("stats_damage") + Weapon.MaxDamage);
+            output.Add(messages.GetMessage("stats_weapon") + messages.TranslateWeaponForDisplay(Weapon.Type));
+            output.Add(messages.GetMessage("stats_damage") + Weapon.MaxDamage);
         }
+
+        if (Armor != null)
+        {
+            output.Add(messages.GetMessage("stats_armor") + messages.TranslateArmorForDisplay(Armor.Type));
+            output.Add(messages.GetMessage("stats_damage_reduction") + Armor.DamageReduction);
+        }
+
+        if (Potion != null)
+        {
+            output.Add(messages.GetMessage("stats_potion") + messages.TranslatePotionForDisplay(Potion.Type));
+            output.Add(messages.GetMessage("stats_potion_restores") + Potion.HealthPointsRestored);
+        }
+
+        return string.Join(Environment.NewLine, output);
+    }
+
+    // Split from the roll so the arithmetic can be asserted without seeding Die, which is
+    // constructed privately here and cannot be injected. Maximum Health Points is recorded
+    // from the same figure rather than derived later, so a Halfling's subtracted Strength
+    // modifier lowers the ceiling along with the roll: the cap reflects the Character
+    // actually rolled. See docs/adr/0002-healing-as-a-capped-flat-restore-that-costs-the-round.md.
+    public void SetHealthPointsAtCreation(int roll, int strengthModifier)
+    {
+        HealthPoints = roll + strengthModifier;
+        MaximumHealthPoints = HealthPoints;
+    }
+
+    // Whether the round may be spent on a drink at all. The prompt asks before offering the
+    // option and before spending a round on it, and DrinkPotion refuses off this same answer,
+    // so the two rules are stated once and a caller that forgets to ask is still refused.
+    public bool CanDrinkPotion()
+    {
+        return Potion != null && HealthPoints < MaximumHealthPoints;
+    }
+
+    // The one place Health Points are raised. The restore is flat and clamped at Maximum
+    // Health Points, so the Potion can never make a Character stronger than the one rolled
+    // at creation; any future source of healing must come through here or the ceiling
+    // silently stops working for it, as recorded in
+    // docs/adr/0002-healing-as-a-capped-flat-restore-that-costs-the-round.md.
+    //
+    // It owns both refusals as well, returning their narrative and leaving the Character
+    // untouched, so the fight has no healing arithmetic of its own to get wrong. The
+    // narrative is returned rather than printed, the way the attack methods return theirs.
+    public string DrinkPotion(Messages messages)
+    {
+        if (!CanDrinkPotion())
+            return Potion == null
+                ? string.Format(messages.GetMessage("potion_none_carried"), Name)
+                : string.Format(messages.GetMessage("potion_refused_at_maximum"), Name, MaximumHealthPoints);
+
+        int restored = Math.Min(Potion.HealthPointsRestored, MaximumHealthPoints - HealthPoints);
+        HealthPoints += restored;
+
+        var output = new List<string>();
+
+        output.Add(string.Format(
+            messages.GetMessage("potion_drunk"),
+            Name,
+            messages.TranslatePotionForDisplay(Potion.Type)
+        ));
+
+        if (!string.IsNullOrWhiteSpace(Potion.AsciiArt))
+            output.Add(Potion.AsciiArt);
+
+        output.Add(string.Format(
+            messages.GetMessage("potion_restored"),
+            restored,
+            HealthPoints,
+            MaximumHealthPoints
+        ));
+
+        Potion = null;
+
+        return string.Join(Environment.NewLine, output);
+    }
+
+    // The single step every blow aimed at this Character goes through. Armor is the only
+    // source of Damage Reduction, and the result floors at zero so a blow can never heal.
+    // Any future source of Damage must route through here or Armor stops working for it,
+    // as recorded in docs/adr/0001-armor-as-flat-damage-reduction.md.
+    public int ReduceDamage(int damage)
+    {
+        if (Armor == null)
+            return damage;
+
+        int reduced = damage - Armor.DamageReduction;
+
+        return reduced < 0 ? 0 : reduced;
     }
 
     public int RollAttack()
