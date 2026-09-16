@@ -4,6 +4,13 @@ public class Merchant
     // Priced against Player.StartingGold to afford exactly one item, never two.
     public const int ItemPrice = 75;
 
+    // The single Armor the Merchant stocks. The reduction is calibrated in ADR-0001
+    // against the Dragon's claws and the Character's Health Points: 3 nearly halves the
+    // average blow, while values near 5 make the fight close to unloseable.
+    public const string ArmorType = "magical armor";
+    public const int ArmorDamageReduction = 3;
+    private const string ArmorAsciiArt = "[#####]";
+
     // Added to the replaced Weapon's maximum Damage rather than replacing it, so the
     // ordering the Occupations set at creation survives: every Occupation's upgrade is
     // worth the same, and a Thief's dagger is not levelled up to a Fighter's sword.
@@ -52,12 +59,28 @@ public class Merchant
             case "nothing":
                 return messages.GetMessage("merchant_declined");
 
-            // Buying the Armor is wired up in ticket 06. Until then it is a valid answer
-            // that leaves the Character untouched and says nothing.
             case "armor":
+                return BuyArmor(player, messages);
+
             default:
                 return "";
         }
+    }
+
+    private string BuyArmor(Player player, Messages messages)
+    {
+        if (player.Gold < ItemPrice)
+            return messages.GetMessage("merchant_cannot_afford");
+
+        player.Armor = new Armor(ArmorType, ArmorDamageReduction, ArmorAsciiArt);
+        player.Gold -= ItemPrice;
+
+        return string.Format(
+            messages.GetMessage("merchant_armor_bought"),
+            messages.TranslateArmorForDisplay(player.Armor.Type),
+            player.Armor.DamageReduction,
+            player.Gold
+        );
     }
 
     private string BuyMagicalWeapon(Player player, Messages messages)

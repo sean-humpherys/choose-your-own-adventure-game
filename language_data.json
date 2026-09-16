@@ -36,6 +36,8 @@
       "stats_gold": "Gold: ",
       "stats_weapon": "Weapon: ",
       "stats_damage": "Weapon's Maximum Damage Points: ",
+      "stats_armor": "Armor: ",
+      "stats_damage_reduction": "Damage Reduction: ",
       "adventure_ends": "Adventure ends. Bye.",
       "path_prompt_full": "You are walking in the mountains. You see two paths, one leading north and higher into the mountains. The other path leads south and into the woods. Which do you take? Enter 'n' for North. Enter 's' for South. Enter 'e' for exit game.",
       "path_invalid": "Invalid choice. Please enter 'n', 's', or 'e'.",
@@ -48,6 +50,8 @@
       "merchant_invalid": "The Merchant frowns. Enter 'a', 'w', or 'n'.",
       "merchant_declined": "'Nothing, then.' The Merchant shrugs, leads his cart away down the road, and is gone. You keep your Gold and return to the fork.",
       "merchant_weapon_bought": "The Merchant unwraps it and puts it in your hands: a {0}, worth {1} Damage at its best. You have {2} Gold left. 'Use it well,' he says, and takes his cart away down the road.",
+      "merchant_armor_bought": "The Merchant buckles it onto you himself: {0}, turning aside {1} Damage from every blow that lands. You have {2} Gold left. 'It will hold,' he says, and takes his cart away down the road.",
+      "player_armor_absorbed": "The blow lands square on {0} and stops dead. The Armor takes all of it.",
       "merchant_cannot_afford": "The Merchant weighs your purse in his hand and gives it back. 'Not enough, friend. Come again when the road has been kinder.'",
       "merchant_no_weapon_to_better": "'You carry nothing I could better,' says the Merchant. 'The Armor, then, or nothing at all.'",
       "south_path_empty": "You take the South path again. The clearing is empty, the cart tracks already fading. The Merchant has moved on.",
@@ -117,6 +121,9 @@
       "chain lightning spell": "chain lightning spell",
       "shadowfang dagger": "shadowfang dagger",
       "windsong long bow": "windsong long bow"
+    },
+    "displayArmorMap": {
+      "magical armor": "magical armor"
     }
   },
   "Spanish": {
@@ -156,6 +163,8 @@
       "stats_gold": "Oro: ",
       "stats_weapon": "Arma: ",
       "stats_damage": "Puntos Maximos de Dano del Arma: ",
+      "stats_armor": "Armadura: ",
+      "stats_damage_reduction": "Reduccion de Dano: ",
       "adventure_ends": "La aventura termina. Adios.",
       "path_prompt_full": "Estas caminando en las montanas. Ves dos caminos, uno va al norte y mas arriba en las montanas. El otro va al sur y hacia el bosque. Cual tomas? Escribe 'n' para Norte. Escribe 's' para Sur. Escribe 'e' para salir del juego.",
       "path_invalid": "Opcion invalida. Por favor escribe 'n', 's' o 'e'.",
@@ -168,6 +177,8 @@
       "merchant_invalid": "El Mercader frunce el ceno. Escribe 'a', 'w' o 'n'.",
       "merchant_declined": "'Nada, entonces.' El Mercader se encoge de hombros, se lleva su carreta camino abajo, y desaparece. Conservas tu Oro y vuelves a la bifurcacion.",
       "merchant_weapon_bought": "El Mercader la desenvuelve y te la pone en las manos: un {0}, que causa hasta {1} de Dano. Te quedan {2} de Oro. 'Usala bien', dice, y se lleva su carreta camino abajo.",
+      "merchant_armor_bought": "El Mercader te la ajusta el mismo: {0}, que desvia {1} de Dano de cada golpe que acierta. Te quedan {2} de Oro. 'Aguantara', dice, y se lleva su carreta camino abajo.",
+      "player_armor_absorbed": "El golpe cae de lleno sobre {0} y se detiene en seco. La Armadura se lo lleva todo.",
       "merchant_cannot_afford": "El Mercader sopesa tu bolsa en la mano y te la devuelve. 'No alcanza, amigo. Vuelve cuando el camino haya sido mas generoso.'",
       "merchant_no_weapon_to_better": "'No llevas nada que yo pueda mejorar', dice el Mercader. 'La Armadura, entonces, o nada.'",
       "south_path_empty": "Tomas el camino del sur otra vez. El claro esta vacio y las huellas de la carreta ya se borran. El Mercader se ha marchado.",
@@ -237,6 +248,9 @@
       "chain lightning spell": "hechizo de rayo encadenado",
       "shadowfang dagger": "daga colmillo de sombra",
       "windsong long bow": "arco largo cantoviento"
+    },
+    "displayArmorMap": {
+      "magical armor": "armadura magica"
     }
   },
   "French": {
@@ -276,6 +290,8 @@
       "stats_gold": "Or: ",
       "stats_weapon": "Arme: ",
       "stats_damage": "Points de Dommages Maximum: ",
+      "stats_armor": "Armure: ",
+      "stats_damage_reduction": "Reduction de Dommages: ",
       "adventure_ends": "L'aventure se termine. Au revoir.",
       "path_prompt_full": "Vous marchez dans les montagnes. Vous voyez deux chemins, l'un mene vers le nord et plus haut dans les montagnes. L'autre mene vers le sud et dans les bois. Lequel choisissez-vous ? Tapez 'n' pour Nord. Tapez 's' pour Sud. Tapez 'e' pour quitter le jeu.",
       "path_invalid": "Choix invalide. Veuillez taper 'n', 's' ou 'e'.",
@@ -288,6 +304,8 @@
       "merchant_invalid": "Le Marchand fronce les sourcils. Entrez 'a', 'w' ou 'n'.",
       "merchant_declined": "'Rien, donc.' Le Marchand hausse les epaules, emmene sa charrette sur la route, et disparait. Vous gardez votre Or et revenez a la bifurcation.",
       "merchant_weapon_bought": "Le Marchand la deballe et vous la met en main: un {0}, qui inflige jusqu'a {1} de Dommages. Il vous reste {2} d'Or. 'Servez-vous-en bien', dit-il, et il emmene sa charrette sur la route.",
+      "merchant_armor_bought": "Le Marchand vous la sangle lui-meme: {0}, qui detourne {1} de Dommages de chaque coup qui porte. Il vous reste {2} d'Or. 'Elle tiendra', dit-il, et il emmene sa charrette sur la route.",
+      "player_armor_absorbed": "Le coup frappe {0} de plein fouet et s'arrete net. L'Armure encaisse tout.",
       "merchant_cannot_afford": "Le Marchand soupese votre bourse et vous la rend. 'Pas assez, l'ami. Revenez quand la route aura ete plus clemente.'",
       "merchant_no_weapon_to_better": "'Vous ne portez rien que je puisse ameliorer', dit le Marchand. 'L'Armure, alors, ou rien du tout.'",
       "south_path_empty": "Vous reprenez le chemin du sud. La clairiere est vide, les traces de la charrette s'effacent deja. Le Marchand est parti.",
@@ -357,6 +375,9 @@
       "chain lightning spell": "sort d'eclair enchaine",
       "shadowfang dagger": "dague croc d'ombre",
       "windsong long bow": "arc long chantevent"
+    },
+    "displayArmorMap": {
+      "magical armor": "armure magique"
     }
   }
 }

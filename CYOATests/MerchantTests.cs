@@ -104,9 +104,24 @@ public class MerchantTests
         Assert.AreSame(carried, player.Weapon);
     }
 
-    // Buying the Armor is wired up in ticket 06; until then it is accepted and does nothing.
+    // --- Buying the Armor ---
+
     [TestMethod]
-    public void ApplyChoice_BuyingArmorIsAcceptedButChangesNothingYet()
+    public void ApplyChoice_Armor_EquipsTheArmorAndDeductsThePrice()
+    {
+        Merchant merchant = new Merchant();
+        Player player = CreateTestPlayer();
+
+        merchant.ApplyChoice(player, "armor", GetMessages("English"));
+
+        Assert.IsNotNull(player.Armor);
+        Assert.AreEqual(Merchant.ArmorType, player.Armor!.Type);
+        Assert.AreEqual(Merchant.ArmorDamageReduction, player.Armor.DamageReduction);
+        Assert.AreEqual(Player.StartingGold - Merchant.ItemPrice, player.Gold);
+    }
+
+    [TestMethod]
+    public void ApplyChoice_Armor_LeavesTheCarriedWeaponUntouched()
     {
         Merchant merchant = new Merchant();
         Player player = CreateTestPlayer();
@@ -114,8 +129,90 @@ public class MerchantTests
 
         merchant.ApplyChoice(player, "armor", GetMessages("English"));
 
-        Assert.AreEqual(Player.StartingGold, player.Gold);
         Assert.AreSame(carried, player.Weapon);
+        Assert.AreEqual(12, player.Weapon!.MaxDamage);
+    }
+
+    [TestMethod]
+    [DataRow("English")]
+    [DataRow("Spanish")]
+    [DataRow("French")]
+    public void ApplyChoice_Armor_ConfirmsThePurchaseInTheNarrative(string language)
+    {
+        Merchant merchant = new Merchant();
+        Player player = CreateTestPlayer();
+        Messages messages = GetMessages(language);
+
+        string narrative = merchant.ApplyChoice(player, "armor", messages);
+
+        Assert.IsFalse(string.IsNullOrWhiteSpace(narrative), $"The {language} purchase said nothing.");
+        Assert.IsFalse(narrative.Contains("[merchant"), $"The {language} confirmation fell back to a raw key: {narrative}");
+        StringAssert.Contains(narrative, messages.TranslateArmorForDisplay(Merchant.ArmorType),
+            $"The {language} confirmation does not name the Armor in that language.");
+    }
+
+    [TestMethod]
+    public void ApplyChoice_Armor_SucceedsWhenTheGoldExactlyCoversThePrice()
+    {
+        Merchant merchant = new Merchant();
+        Player player = CreateTestPlayer();
+        player.Gold = Merchant.ItemPrice;
+
+        merchant.ApplyChoice(player, "armor", GetMessages("English"));
+
+        Assert.IsNotNull(player.Armor);
+        Assert.AreEqual(0, player.Gold);
+    }
+
+    [TestMethod]
+    public void ApplyChoice_Armor_IsRefusedWhenTheGoldFallsOneShort()
+    {
+        Merchant merchant = new Merchant();
+        Player player = CreateTestPlayer();
+        player.Gold = Merchant.ItemPrice - 1;
+
+        merchant.ApplyChoice(player, "armor", GetMessages("English"));
+
+        Assert.IsNull(player.Armor);
+        Assert.AreEqual(Merchant.ItemPrice - 1, player.Gold);
+    }
+
+    // A weaponless Character is offered the Armor, so buying it must still work for them.
+    [TestMethod]
+    public void ApplyChoice_Armor_WorksForACharacterCarryingNoWeapon()
+    {
+        Merchant merchant = new Merchant();
+        Player player = CreateTestPlayer();
+        player.Weapon = null;
+
+        merchant.ApplyChoice(player, "armor", GetMessages("English"));
+
+        Assert.IsNotNull(player.Armor);
+        Assert.IsNull(player.Weapon);
+        Assert.AreEqual(Player.StartingGold - Merchant.ItemPrice, player.Gold);
+    }
+
+    // Deferred from ticket 05, which had no Armor to assert against.
+    [TestMethod]
+    public void ApplyChoice_Weapon_LeavesArmorUnset()
+    {
+        Merchant merchant = new Merchant();
+        Player player = CreateTestPlayer();
+
+        merchant.ApplyChoice(player, "weapon", GetMessages("English"));
+
+        Assert.IsNull(player.Armor);
+    }
+
+    [TestMethod]
+    public void ApplyChoice_Nothing_LeavesArmorUnset()
+    {
+        Merchant merchant = new Merchant();
+        Player player = CreateTestPlayer();
+
+        merchant.ApplyChoice(player, "nothing", GetMessages("English"));
+
+        Assert.IsNull(player.Armor);
     }
 
     // --- Buying the Magical Weapon ---

@@ -18,6 +18,8 @@ public class Player
 
     public Weapon? Weapon { get; set; }
 
+    public Armor? Armor { get; set; }
+
     public void CreateCharacter(Messages messages)
     {
         Race = PromptForRace(messages);
@@ -166,7 +168,27 @@ public class Player
             output.Add(messages.GetMessage("stats_damage") + Weapon.MaxDamage);
         }
 
+        if (Armor != null)
+        {
+            output.Add(messages.GetMessage("stats_armor") + messages.TranslateArmorForDisplay(Armor.Type));
+            output.Add(messages.GetMessage("stats_damage_reduction") + Armor.DamageReduction);
+        }
+
         return string.Join(Environment.NewLine, output);
+    }
+
+    // The single step every blow aimed at this Character goes through. Armor is the only
+    // source of Damage Reduction, and the result floors at zero so a blow can never heal.
+    // Any future source of Damage must route through here or Armor stops working for it,
+    // as recorded in docs/adr/0001-armor-as-flat-damage-reduction.md.
+    public int ReduceDamage(int damage)
+    {
+        if (Armor == null)
+            return damage;
+
+        int reduced = damage - Armor.DamageReduction;
+
+        return reduced < 0 ? 0 : reduced;
     }
 
     public int RollAttack()

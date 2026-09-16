@@ -92,13 +92,21 @@ public class Dragon
             return string.Join(Environment.NewLine, output);
         }
 
-        int damage = RollDamage();
+        // Every blow goes through the Character's reduction step rather than coming off
+        // Health Points directly, so Armor keeps working for this source of Damage.
+        int damage = player.ReduceDamage(RollDamage());
         player.HealthPoints -= damage;
 
         if (player.HealthPoints < 0)
             player.HealthPoints = 0;
 
-        output.Add(string.Format(messages.GetMessage("dragon_damage_dealt"), Name, damage));
+        // The Armor stopped the blow. This is not a dodge and must not say it was one:
+        // the Character did not evade, and conflating the two misrepresents the purchase.
+        if (damage == 0)
+            output.Add(string.Format(messages.GetMessage("player_armor_absorbed"), player.Name));
+        else
+            output.Add(string.Format(messages.GetMessage("dragon_damage_dealt"), Name, damage));
+
         output.Add(string.Format(messages.GetMessage("player_health_now"), player.Name, player.HealthPoints));
 
         if (player.HealthPoints <= 0)

@@ -64,6 +64,12 @@ public class Combat
             output.Add(messages.GetMessage("stats_damage") + player.Weapon.MaxDamage);
         }
 
+        if (player.Armor != null)
+        {
+            output.Add(messages.GetMessage("stats_armor") + messages.TranslateArmorForDisplay(player.Armor.Type));
+            output.Add(messages.GetMessage("stats_damage_reduction") + player.Armor.DamageReduction);
+        }
+
         output.Add("");
         output.Add(messages.GetMessage("combat_dragon_header"));
         output.Add(messages.GetMessage("stats_name") + dragon.Name);
