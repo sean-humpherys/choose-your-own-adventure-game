@@ -425,3 +425,8 @@ obj/
 .vs/
 *.user
 .vscode/
+
+# Agent skill definitions, vendored from mattpocock/skills. Restorable from
+# skills-lock.json, which is tracked. .claude/skills is a symlink tree into .agents.
+.agents/
+.claude/
