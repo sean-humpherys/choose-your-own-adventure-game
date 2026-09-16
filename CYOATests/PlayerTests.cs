@@ -168,7 +168,10 @@ public class PlayerTests
         Assert.IsFalse(result.Contains("[stats_"));
     }
 
+    // Console redirection is process-global and this assembly parallelizes by method,
+    // so every test that captures the Console must sit in the same serial phase.
     [TestMethod]
+    [DoNotParallelize]
     public void DisplayStats_WritesTheStatsDisplayToTheConsole()
     {
         Player player = CreateTestPlayer();

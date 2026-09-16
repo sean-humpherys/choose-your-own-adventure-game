@@ -379,4 +379,136 @@ public class GameTests
         Game game = new Game();
         Assert.IsTrue(game.IsValidCombatChoice("  a  "));
     }
+
+    // --- IsValidMerchantChoice ---
+
+    [TestMethod]
+    [DataRow("a")]
+    [DataRow("armor")]
+    [DataRow("w")]
+    [DataRow("weapon")]
+    [DataRow("n")]
+    [DataRow("nothing")]
+    public void IsValidMerchantChoice_ReturnsTrue_ForEveryAcceptedSpelling(string input)
+    {
+        Game game = new Game();
+        Assert.IsTrue(game.IsValidMerchantChoice(input));
+    }
+
+    [TestMethod]
+    [DataRow("A")]
+    [DataRow("ARMOR")]
+    [DataRow("Weapon")]
+    [DataRow("NOTHING")]
+    public void IsValidMerchantChoice_ReturnsTrue_RegardlessOfCase(string input)
+    {
+        Game game = new Game();
+        Assert.IsTrue(game.IsValidMerchantChoice(input));
+    }
+
+    [TestMethod]
+    [DataRow("  a  ")]
+    [DataRow("  armor  ")]
+    [DataRow("  w  ")]
+    [DataRow(" WEAPON ")]
+    [DataRow("  n  ")]
+    [DataRow("  nothing  ")]
+    public void IsValidMerchantChoice_ReturnsTrue_WhenPaddedWithWhitespace(string input)
+    {
+        Game game = new Game();
+        Assert.IsTrue(game.IsValidMerchantChoice(input));
+    }
+
+    [TestMethod]
+    public void IsValidMerchantChoice_ReturnsFalse_ForNull()
+    {
+        Game game = new Game();
+        Assert.IsFalse(game.IsValidMerchantChoice(null));
+    }
+
+    [TestMethod]
+    public void IsValidMerchantChoice_ReturnsFalse_ForEmpty()
+    {
+        Game game = new Game();
+        Assert.IsFalse(game.IsValidMerchantChoice(""));
+    }
+
+    [TestMethod]
+    public void IsValidMerchantChoice_ReturnsFalse_ForWhitespace()
+    {
+        Game game = new Game();
+        Assert.IsFalse(game.IsValidMerchantChoice("   "));
+    }
+
+    [TestMethod]
+    [DataRow("banana")]
+    [DataRow("buy")]
+    [DataRow("1")]
+    public void IsValidMerchantChoice_ReturnsFalse_ForJunk(string input)
+    {
+        Game game = new Game();
+        Assert.IsFalse(game.IsValidMerchantChoice(input));
+    }
+
+    // --- The Merchant Encounter ---
+    // Console-driven, so the ticket asks only that it not throw; its real logic lives
+    // behind Merchant.ApplyChoice and IsValidMerchantChoice, which are asserted properly.
+    // HandleMerchantEncounter is public only so these can drive it.
+
+    // Console redirection is process-global and this assembly parallelizes by method,
+    // so these two must not run alongside anything else or they lose their fake stdin.
+    [TestMethod]
+    [DoNotParallelize]
+    [DataRow("English")]
+    [DataRow("Spanish")]
+    [DataRow("French")]
+    public void HandleMerchantEncounter_DoesNotThrow_WhenThePlayerDeclines(string language)
+    {
+        RunWithConsoleInput("n", () =>
+        {
+            Game game = new Game();
+            game.HandleMerchantEncounter(NewPlayer(), GetMessages(language));
+        });
+    }
+
+    [TestMethod]
+    [DoNotParallelize]
+    public void HandleMerchantEncounter_DoesNotThrow_WhenAnInvalidAnswerIsRePrompted()
+    {
+        RunWithConsoleInput("banana\n\n   \nn", () =>
+        {
+            Game game = new Game();
+            game.HandleMerchantEncounter(NewPlayer(), GetMessages("English"));
+        });
+    }
+
+    private static Player NewPlayer()
+    {
+        return new Player
+        {
+            Name = "TestHero",
+            Race = "Human",
+            Occupation = "Fighter",
+            Weapon = new Weapon("long sword", 12, "-)=====>")
+        };
+    }
+
+    // Drives the prompt loop from a canned answer and swallows its output, so the
+    // Console-driven Encounter can be exercised without a human at the keyboard.
+    private static void RunWithConsoleInput(string input, Action action)
+    {
+        TextReader originalIn = Console.In;
+        TextWriter originalOut = Console.Out;
+        try
+        {
+            Console.SetIn(new StringReader(input));
+            Console.SetOut(new StringWriter());
+            action();
+        }
+        finally
+        {
+            Console.SetIn(originalIn);
+            Console.SetOut(originalOut);
+        }
+    }
 }
