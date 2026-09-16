@@ -138,19 +138,28 @@ public class Player
 
     public void DisplayStats(Messages messages)
     {
-        Console.WriteLine(messages.GetMessage("stats_header"));
-        Console.WriteLine(messages.GetMessage("stats_name") + Name);
-        Console.WriteLine(messages.GetMessage("stats_race") + messages.TranslateRaceForDisplay(Race));
-        Console.WriteLine(messages.GetMessage("stats_occupation") + messages.TranslateOccupationForDisplay(Occupation));
-        Console.WriteLine(messages.GetMessage("stats_strength") + Strength);
-        Console.WriteLine(messages.GetMessage("stats_agility") + Agility);
-        Console.WriteLine(messages.GetMessage("stats_health") + HealthPoints);
+        Console.WriteLine(GetStatsDisplay(messages));
+    }
+
+    public string GetStatsDisplay(Messages messages)
+    {
+        var output = new List<string>();
+
+        output.Add(messages.GetMessage("stats_header"));
+        output.Add(messages.GetMessage("stats_name") + Name);
+        output.Add(messages.GetMessage("stats_race") + messages.TranslateRaceForDisplay(Race));
+        output.Add(messages.GetMessage("stats_occupation") + messages.TranslateOccupationForDisplay(Occupation));
+        output.Add(messages.GetMessage("stats_strength") + Strength);
+        output.Add(messages.GetMessage("stats_agility") + Agility);
+        output.Add(messages.GetMessage("stats_health") + HealthPoints);
 
         if (Weapon != null)
         {
-            Console.WriteLine(messages.GetMessage("stats_weapon") + messages.TranslateWeaponForDisplay(Weapon.Type));
-            Console.WriteLine(messages.GetMessage("stats_damage") + Weapon.MaxDamage);
+            output.Add(messages.GetMessage("stats_weapon") + messages.TranslateWeaponForDisplay(Weapon.Type));
+            output.Add(messages.GetMessage("stats_damage") + Weapon.MaxDamage);
         }
+
+        return string.Join(Environment.NewLine, output);
     }
 
     public int RollAttack()
