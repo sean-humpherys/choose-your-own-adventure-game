@@ -42,29 +42,8 @@ public class Game
                 Player player = new Player();
                 player.CreateCharacter(messages);
 
-                bool inAdventureMenu = true;
-                while (inAdventureMenu)
-                {
-                    string selectedPath = PromptForPath(messages);
-
-                    if (selectedPath == "exit")
-                    {
-                        Console.WriteLine(messages.GetMessage("adventure_ends"));
-                        running = false;
-                        inAdventureMenu = false;
-                    }
-                    else if (selectedPath == "south")
-                    {
-                        Console.WriteLine(messages.GetMessage("south_path_narrative"));
-                    }
-                    else if (selectedPath == "north")
-                    {
-                        HandleDragonEncounter(player, dragon, messages);
-
-                        running = false;
-                        inAdventureMenu = false;
-                    }
-                }
+                PlayFromFork(player, dragon, messages);
+                running = false;
             }
             else if (choice == "2")
             {
@@ -95,21 +74,124 @@ public class Game
         return trimmed == "1" || trimmed == "2";
     }
 
+    // Answers off the fork's parser, so the validator and the prompt cannot drift apart.
     public bool IsValidPathChoice(string? input)
     {
-        if (string.IsNullOrWhiteSpace(input)) return false;
-        string trimmed = input.Trim().ToLower();
-        return trimmed == "n" || trimmed == "north" ||
-               trimmed == "s" || trimmed == "south" ||
-               trimmed == "e" || trimmed == "exit";
+        return ParseForkChoice(input) != null;
     }
 
+    // Answers off Combat's parser rather than repeating the spellings, so the validator and
+    // the round loop cannot drift apart, exactly as IsValidMerchantChoice does below.
     public bool IsValidCombatChoice(string? input)
     {
-        if (string.IsNullOrWhiteSpace(input)) return false;
-        string trimmed = input.Trim().ToLower();
-        return trimmed == "a" || trimmed == "attack" ||
-               trimmed == "r" || trimmed == "retreat";
+        return Combat.ParseCombatChoice(input) != null;
+    }
+
+    public bool IsValidMerchantChoice(string? input)
+    {
+        return ParseMerchantChoice(input) != null;
+    }
+
+    // The one place the accepted spellings live. Validating and parsing off the same
+    // list means a spelling can never be accepted by one and unrecognised by the other.
+    private string? ParseMerchantChoice(string? input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return null;
+
+        switch (input.Trim().ToLower())
+        {
+            case "a":
+            case "armor":
+                return "armor";
+
+            case "w":
+            case "weapon":
+                return "weapon";
+
+            case "p":
+            case "potion":
+                return "potion";
+
+            case "n":
+            case "nothing":
+                return "nothing";
+
+            default:
+                return null;
+        }
+    }
+
+    // The Adventure from the fork onward. It returns when the Adventure ends: on exit, or
+    // once the north Path's Encounter is over, since that Path never leads back here.
+    private void PlayFromFork(Player player, Dragon dragon, Messages messages)
+    {
+        // Tripped when the Merchant is met, not when something is bought, so
+        // declining consumes the visit. Scoped to the Adventure, so a new
+        // Character meets him afresh.
+        bool merchantMet = false;
+
+        while (true)
+        {
+            string selectedPath = PromptForPath(messages);
+
+            if (selectedPath == "exit")
+            {
+                Console.WriteLine(messages.GetMessage("adventure_ends"));
+                return;
+            }
+
+            // A view, not a Path: it touches neither the Character nor the Merchant flag.
+            if (selectedPath == "character")
+            {
+                player.DisplayStats(messages);
+            }
+            else if (selectedPath == "south")
+            {
+                if (merchantMet)
+                {
+                    Console.WriteLine(messages.GetMessage("south_path_empty"));
+                }
+                else
+                {
+                    HandleMerchantEncounter(player, messages);
+                    merchantMet = true;
+                }
+            }
+            else if (selectedPath == "north")
+            {
+                HandleDragonEncounter(player, dragon, messages);
+                return;
+            }
+        }
+    }
+
+    // The one place the fork's accepted spellings live, as ParseMerchantChoice is for the Merchant.
+    // Named for the fork rather than the Path because "character" is a view, not a Path.
+    private string? ParseForkChoice(string? input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return null;
+
+        switch (input.Trim().ToLower())
+        {
+            case "n":
+            case "north":
+                return "north";
+
+            case "s":
+            case "south":
+                return "south";
+
+            case "e":
+            case "exit":
+                return "exit";
+
+            case "c":
+            case "character":
+                return "character";
+
+            default:
+                return null;
+        }
     }
 
     private string PromptForPath(Messages messages)
@@ -118,18 +200,57 @@ public class Game
         {
             Console.WriteLine(messages.GetMessage("path_prompt_full"));
             Console.Write(messages.GetMessage("enter_choice"));
-            string? input = Console.ReadLine()?.Trim().ToLower();
+            string? input = Console.ReadLine();
 
-            if (input == "north" || input == "n")
-                return "north";
-
-            if (input == "south" || input == "s")
-                return "south";
-
-            if (input == "exit" || input == "e")
+            // End of input, so there is no one left to re-prompt. Exiting is the outcome
+            // that changes nothing, as declining is at the Merchant.
+            if (input == null)
                 return "exit";
 
+            string? path = ParseForkChoice(input);
+
+            if (path != null)
+                return path;
+
             Console.WriteLine(messages.GetMessage("path_invalid"));
+        }
+    }
+
+    private void HandleMerchantEncounter(Player player, Messages messages)
+    {
+        Merchant merchant = new Merchant();
+
+        Console.WriteLine(messages.GetMessage("south_path_narrative"));
+        Console.WriteLine(merchant.GetOffer(player, messages));
+
+        string choice = PromptForMerchantChoice(messages);
+        string narrative = merchant.ApplyChoice(player, choice, messages);
+
+        // Every answer the prompt can return has something to say; the guard covers only
+        // the unparseable choice the seam refuses to narrate.
+        if (narrative.Length > 0)
+            Console.WriteLine(narrative);
+    }
+
+    private string PromptForMerchantChoice(Messages messages)
+    {
+        while (true)
+        {
+            Console.WriteLine(messages.GetMessage("merchant_prompt"));
+            Console.Write(messages.GetMessage("enter_choice"));
+            string? input = Console.ReadLine();
+
+            // End of input, so there is no one left to re-prompt. Declining is the
+            // outcome that leaves the Character untouched, so it is the safe one.
+            if (input == null)
+                return "nothing";
+
+            string? choice = ParseMerchantChoice(input);
+
+            if (choice != null)
+                return choice;
+
+            Console.WriteLine(messages.GetMessage("merchant_invalid"));
         }
     }
 

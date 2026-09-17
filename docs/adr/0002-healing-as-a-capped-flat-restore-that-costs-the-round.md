@@ -1,0 +1,22 @@
+# Healing is a capped, flat restore that costs the Character's round
+
+The game had no healing concept: Health Points only ever fell, so a low roll at creation was unrecoverable and the player had no move to make about survival. Adding a Merchant-sold **Healing Potion** meant inventing a mechanic. We chose a **flat restore, clamped at Maximum Health Points, that consumes the Character's action for the round**: drinking restores a fixed number of Health Points or raises the Character to Maximum Health Points, whichever is lower, consumes the Potion, and replaces the attack for that round while the Dragon still swings.
+
+## Considered Options
+
+- **Uncapped healing.** Simplest to write: add the restore to Health Points and stop. Rejected because it turns the Potion into a way to exceed the Character the player actually rolled. `CONTEXT.md` defines Maximum Health Points as the Health Points a Character is created with, fixed for the Adventure, and a Potion that pushes past it makes a Halfling's negative Strength modifier — and the whole creation roll — something a purchase can undo.
+- **A rolled restore.** Thematically closer to the rest of combat, which rolls for everything. Rejected because `Die` is constructed privately inside the Character and cannot be seeded from a test, so a rolled amount would be untestable by construction. ADR-0001 chose a flat Damage Reduction for the same reason. A flat amount is also legible to the player at the moment it matters: they must decide whether the restore will carry them through the next blow.
+- **Drinking as a free action**, taken alongside the attack. Rejected because it makes the Potion strictly dominant — there is no cost to drinking, so there is no decision about when — and the fight becomes close to unloseable while one is carried. That is the same failure mode ADR-0001 identified for over-generous Damage Reduction.
+- **A capped, flat restore costing the round (chosen).** One new value on a small `Potion` class mirroring `Armor`, one new quantity on the Character, and a single drinking method that is deterministic arithmetic and can be asserted against directly.
+
+## Consequences
+
+The restore is calibrated against the Dragon's claws (MaxDamage 12, averaging 6.5 per blow) and the Health Points a Character actually rolls. Note that ADR-0001's figure of 10.5 is the bare d20: `Player.RollHealthPoints` adds the Strength modifier, so the true average is about 13, and about 8 for a Halfling, whose modifier is subtracted. A restore of 8 is therefore a little over one average blow, and a little over half a typical Character's whole Health Points.
+
+Against that, the Magical Armor's Damage Reduction of 3 saves at most 6 to 9 Health Points across the two or three blows a typical fight lands — at most, because a blow rolling under 3 has less than 3 to take off. A restore of 8 therefore sits at the top of what the Armor is worth, which is what keeps the three wares a real choice at one shared price. The Potion is not the equal of the Armor, though, and should not be read as one: the Armor's saving accrues free across the fight, while the Potion's 8 costs a round — a free Dragon swing, 6.5 expected — and is clamped by what has actually been lost.
+
+That calibration produces an intended optimal play: **hold the Potion until well wounded.** Drinking early is punished by the clamp, which throws away everything above Maximum Health Points; drinking while safe is punished by the lost round, which hands the Dragon a free swing. The window is genuinely narrow — realising the full 8 means being 8 Health Points down, which on a low-rolled Character is most of the way to defeat — and a future reader should recognise that as the design rather than a flaw to correct. The restore and the price are tuning and may be adjusted, provided the price still lets the purse afford exactly one ware and the restore stays large enough to be worth a lost round.
+
+The Adventure gets a little more survivable; the Dragon is not rebalanced to compensate, and that is accepted.
+
+Any future source of healing must route through the same clamp rather than adding to `HealthPoints` directly, or the ceiling silently stops working for that source. This is ADR-0001's closing warning in mirror image: there it was Damage bypassing the Character's reduction step and silently breaking Armor, here it is a second way to raise Health Points bypassing Maximum Health Points and silently breaking the cap.
