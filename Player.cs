@@ -1,6 +1,17 @@
 public class Player
 {
-    private readonly Die _die = new Die();
+    private readonly Die _die;
+
+    public Player()
+        : this(new Die())
+    {
+    }
+
+    // Lets tests hand the Character a scripted Die, so its rolls can be pinned.
+    public Player(Die die)
+    {
+        _die = die;
+    }
 
     public string Name { get; set; } = "";
     public string Race { get; set; } = "";

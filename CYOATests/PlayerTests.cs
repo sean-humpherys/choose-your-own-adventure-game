@@ -304,4 +304,24 @@ public class PlayerTests
         StringAssert.Contains(result, messages.GetMessage("stats_armor") + messages.TranslateArmorForDisplay(player.Armor.Type));
         StringAssert.Contains(result, messages.GetMessage("stats_damage_reduction") + player.Armor.DamageReduction);
     }
+
+    [TestMethod]
+    public void RollAttack_ReturnsTheScriptedRoll_WhenBuiltWithADie()
+    {
+        ScriptedDie die = new ScriptedDie(17);
+        Player player = new Player(die);
+
+        Assert.AreEqual(17, player.RollAttack());
+        die.AssertAllRollsUsed();
+    }
+
+    [TestMethod]
+    public void RollAttack_RollsItsOwnDie_WhenBuiltWithNoArguments()
+    {
+        Player player = new Player();
+
+        int roll = player.RollAttack();
+
+        Assert.IsTrue(roll >= 1 && roll <= 20);
+    }
 }
