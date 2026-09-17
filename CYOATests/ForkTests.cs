@@ -163,8 +163,13 @@ public class ForkTests
 
         string output = RunFork(player, messages, "c\ne\n");
 
-        StringAssert.Contains(output, player.GetStatsDisplay(messages));
-        Assert.AreEqual(2, CountOccurrences(output, messages.GetMessage("path_prompt_full")));
+        string prompt = messages.GetMessage("path_prompt_full");
+        int summaryAt = output.IndexOf(player.GetStatsDisplay(messages), StringComparison.Ordinal);
+
+        Assert.IsTrue(summaryAt >= 0, "The Character summary was not printed.");
+        Assert.IsTrue(output.IndexOf(prompt, summaryAt, StringComparison.Ordinal) > summaryAt,
+            "The fork prompt was not asked again after the summary.");
+        Assert.AreEqual(2, CountOccurrences(output, prompt));
         Assert.IsFalse(output.Contains(messages.GetMessage("path_invalid")));
     }
 

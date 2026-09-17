@@ -77,7 +77,7 @@ public class Game
     // Answers off the fork's parser, so the validator and the prompt cannot drift apart.
     public bool IsValidPathChoice(string? input)
     {
-        return ParsePathChoice(input) != null;
+        return ParseForkChoice(input) != null;
     }
 
     // Answers off Combat's parser rather than repeating the spellings, so the validator and
@@ -166,7 +166,8 @@ public class Game
     }
 
     // The one place the fork's accepted spellings live, as ParseMerchantChoice is for the Merchant.
-    private string? ParsePathChoice(string? input)
+    // Named for the fork rather than the Path because "character" is a view, not a Path.
+    private string? ParseForkChoice(string? input)
     {
         if (string.IsNullOrWhiteSpace(input)) return null;
 
@@ -206,7 +207,7 @@ public class Game
             if (input == null)
                 return "exit";
 
-            string? path = ParsePathChoice(input);
+            string? path = ParseForkChoice(input);
 
             if (path != null)
                 return path;
