@@ -7,9 +7,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 // or, once AssertAllRollsUsed is called, when a scripted roll was never asked for.
 public class ScriptedDie : Die
 {
-    // Building a Dragon rolls its Strength, Agility and Health Points first.
-    public const int DragonStatRolls = 3;
-
     private readonly ScriptedRolls _rolls;
 
     public ScriptedDie(params int[] rolls)
