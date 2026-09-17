@@ -299,7 +299,7 @@ public class Player : ICombatant
 
     public bool AttackHits(int attackRoll)
     {
-        return attackRoll <= Strength;
+        return Blow.Lands(attackRoll, Strength);
     }
 
     public int RollDamage()
@@ -311,7 +311,7 @@ public class Player : ICombatant
     }
 
     // The target's Defense Roll against the Character's Blow, rolled on the Character's Die.
-    public int RollDefense()
+    public int RollTargetDefense()
     {
         return _die.Roll(20);
     }

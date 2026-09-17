@@ -12,7 +12,7 @@ public interface ICombatant
 
     // The target's Defense Roll against this combatant's Blow. It is rolled on the
     // attacker's Die, as it always has been, so it belongs to the attacker.
-    int RollDefense();
+    int RollTargetDefense();
 
     // Takes the Damage of a landed Blow and returns the Damage actually taken. Each
     // combatant's own response lives here, so no Blow can bypass it.

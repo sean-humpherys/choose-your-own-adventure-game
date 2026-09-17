@@ -6,10 +6,10 @@ public static class Blow
     {
         int attackRoll = attacker.RollAttack();
 
-        if (attackRoll > attacker.Strength)
+        if (!Lands(attackRoll, attacker.Strength))
             return new BlowResult(BlowOutcome.Missed, 0, false);
 
-        int defenseRoll = attacker.RollDefense();
+        int defenseRoll = attacker.RollTargetDefense();
 
         if (defenseRoll <= target.Agility)
             return new BlowResult(BlowOutcome.Dodged, 0, false);
@@ -20,13 +20,10 @@ public static class Blow
 
         return new BlowResult(BlowOutcome.Landed, damageTaken, target.HealthPoints <= 0);
     }
-}
 
-public enum BlowOutcome
-{
-    Missed,
-    Dodged,
-    Landed
+    // A Blow lands when the Attack Roll is at most the attacker's Strength.
+    public static bool Lands(int attackRoll, int strength)
+    {
+        return attackRoll <= strength;
+    }
 }
-
-public record BlowResult(BlowOutcome Outcome, int DamageTaken, bool TargetDefeated);

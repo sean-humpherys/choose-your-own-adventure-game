@@ -21,7 +21,7 @@ Keep behaviour frozen. The Dragon's Health Points stay unfloored, and the no-Wea
 
 **Blocked by:** 02 (Pin down the Character's Blow on the Dragon), 03 (Pin down the Dragon's Blow on the Character)
 
-**Status:** ready-for-agent
+**Status:** ready-for-agent (implemented)
 
 - [ ] One module resolves a Blow for either attacker. Neither attack method still performs its own Attack Roll, Defense Roll or Damage arithmetic.
 - [ ] The module returns data and produces no narration or Console output.

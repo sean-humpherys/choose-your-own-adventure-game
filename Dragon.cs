@@ -52,7 +52,7 @@ public class Dragon : ICombatant
 
     public bool AttackHits(int attackRoll)
     {
-        return attackRoll <= Strength;
+        return Blow.Lands(attackRoll, Strength);
     }
 
     public int RollDamage()
@@ -61,7 +61,7 @@ public class Dragon : ICombatant
     }
 
     // The target's Defense Roll against the Dragon's Blow, rolled on the Dragon's Die.
-    public int RollDefense()
+    public int RollTargetDefense()
     {
         return _die.Roll(20);
     }
