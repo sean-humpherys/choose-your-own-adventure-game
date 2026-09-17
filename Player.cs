@@ -1,4 +1,4 @@
-public class Player
+public class Player : ICombatant
 {
     private readonly Die _die;
 
@@ -310,6 +310,24 @@ public class Player
         return _die.Roll(Weapon.MaxDamage);
     }
 
+    // The target's Defense Roll against the Character's Blow, rolled on the Character's Die.
+    public int RollDefense()
+    {
+        return _die.Roll(20);
+    }
+
+    // Damage aimed at the Character goes through its reduction step and stops at zero.
+    public int TakeDamage(int damage)
+    {
+        int taken = ReduceDamage(damage);
+        HealthPoints -= taken;
+
+        if (HealthPoints < 0)
+            HealthPoints = 0;
+
+        return taken;
+    }
+
     public string Attack(Dragon dragon, Messages messages)
     {
         if (Weapon == null)
@@ -326,10 +344,9 @@ public class Player
         // If this fails to compile, change AsciiArt to whatever exists in Weapon.cs
         output.Add(Weapon.AsciiArt);
 
-        int attackRoll = RollAttack();
+        BlowResult blow = Blow.Resolve(this, dragon);
 
-        // MISS
-        if (!AttackHits(attackRoll))
+        if (blow.Outcome == BlowOutcome.Missed)
         {
             output.Add(string.Format(messages.GetMessage("player_missed_dragon"), dragon.Name));
             return string.Join(Environment.NewLine, output);
@@ -337,10 +354,7 @@ public class Player
 
         output.Add(string.Format(messages.GetMessage("player_hit_dragon"), dragon.Name));
 
-        int defenseRoll = _die.Roll(20);
-
-        // DEFENSE
-        if (defenseRoll <= dragon.Agility)
+        if (blow.Outcome == BlowOutcome.Dodged)
         {
             output.Add(string.Format(messages.GetMessage("dragon_defended_player_attack"), dragon.Name));
             output.Add(string.Format(
@@ -350,15 +364,10 @@ public class Player
             return string.Join(Environment.NewLine, output);
         }
 
-        // DAMAGE
-        int damage = RollDamage();
-        dragon.HealthPoints -= damage;
-
-        output.Add(string.Format(messages.GetMessage("player_damage_dealt"), damage));
+        output.Add(string.Format(messages.GetMessage("player_damage_dealt"), blow.DamageTaken));
         output.Add(string.Format(messages.GetMessage("dragon_health_now"), dragon.Name, dragon.HealthPoints));
 
-        // END
-        if (dragon.HealthPoints <= 0)
+        if (blow.TargetDefeated)
             output.Add(messages.GetMessage("dragon_defeated_narrative"));
         else
             output.Add(dragon.GetRandomDamageReply(messages));
