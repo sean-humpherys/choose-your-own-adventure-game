@@ -150,6 +150,97 @@ public class ForkTests
         Assert.IsFalse(output.Contains(messages.GetMessage("merchant_greeting")));
     }
 
+    // --- Viewing the Character at the fork ---
+
+    [TestMethod]
+    [DataRow("English")]
+    [DataRow("Spanish")]
+    [DataRow("French")]
+    public void Character_PrintsTheSummary_ThenAsksAgain(string language)
+    {
+        Messages messages = GetMessages(language);
+        Player player = CreateTestPlayer();
+
+        string output = RunFork(player, messages, "c\ne\n");
+
+        StringAssert.Contains(output, player.GetStatsDisplay(messages));
+        Assert.AreEqual(2, CountOccurrences(output, messages.GetMessage("path_prompt_full")));
+        Assert.IsFalse(output.Contains(messages.GetMessage("path_invalid")));
+    }
+
+    [TestMethod]
+    [DataRow("English")]
+    [DataRow("Spanish")]
+    [DataRow("French")]
+    public void Character_BeforeGoingSouth_LeavesTheMerchantWaiting(string language)
+    {
+        Messages messages = GetMessages(language);
+
+        string output = RunFork(CreateTestPlayer(), messages, "c\ns\nn\ne\n");
+
+        StringAssert.Contains(output, messages.GetMessage("merchant_greeting"));
+        Assert.IsFalse(output.Contains(messages.GetMessage("south_path_empty")));
+    }
+
+    [TestMethod]
+    [DataRow("English")]
+    [DataRow("Spanish")]
+    [DataRow("French")]
+    public void Character_AfterMeetingTheMerchant_DoesNotBringHimBack(string language)
+    {
+        Messages messages = GetMessages(language);
+
+        string output = RunFork(CreateTestPlayer(), messages, "s\nn\nc\ns\ne\n");
+
+        Assert.AreEqual(1, CountOccurrences(output, messages.GetMessage("merchant_greeting")));
+        StringAssert.Contains(output, messages.GetMessage("south_path_empty"));
+    }
+
+    [TestMethod]
+    [DataRow("English")]
+    [DataRow("Spanish")]
+    [DataRow("French")]
+    public void Character_Twice_ThenExit_PrintsTheSummaryTwice_AndEndsTheAdventure(string language)
+    {
+        Messages messages = GetMessages(language);
+        Player player = CreateTestPlayer();
+
+        string output = RunFork(player, messages, "c\n  CHARACTER  \ne\n");
+
+        Assert.AreEqual(2, CountOccurrences(output, player.GetStatsDisplay(messages)));
+        StringAssert.Contains(output, messages.GetMessage("adventure_ends"));
+    }
+
+    // A purchase shows up the next time the Character is viewed, Gold included.
+    [TestMethod]
+    [DataRow("English")]
+    [DataRow("Spanish")]
+    [DataRow("French")]
+    public void Character_AfterBuyingArmor_ShowsTheArmorAndTheLowerGold(string language)
+    {
+        Messages messages = GetMessages(language);
+        Player player = CreateTestPlayer();
+
+        string output = RunFork(player, messages, "s\na\nc\ne\n");
+
+        StringAssert.Contains(output, messages.GetMessage("stats_armor") + messages.TranslateArmorForDisplay(Merchant.ArmorType));
+        StringAssert.Contains(output, messages.GetMessage("stats_gold") + 25);
+    }
+
+    [TestMethod]
+    [DataRow("English", "Enter 'c' to view your character.", "Invalid choice. Please enter 'n', 's', 'e', or 'c'.")]
+    [DataRow("Spanish", "Escribe 'c' para ver tu personaje.", "Opcion invalida. Por favor escribe 'n', 's', 'e' o 'c'.")]
+    [DataRow("French", "Tapez 'c' pour voir votre personnage.", "Choix invalide. Veuillez taper 'n', 's', 'e' ou 'c'.")]
+    public void ForkWording_OffersTheCharacterLast_AndListsItWhenTheChoiceIsInvalid(
+        string language, string closingSentence, string invalidChoice)
+    {
+        Messages messages = GetMessages(language);
+
+        Assert.IsTrue(messages.GetMessage("path_prompt_full").EndsWith(" " + closingSentence),
+            $"The {language} fork prompt does not end with the Character sentence.");
+        Assert.AreEqual(invalidChoice, messages.GetMessage("path_invalid"));
+    }
+
     // Run on a task with a deadline, so a regression back to re-prompting forever fails
     // the test instead of hanging the run.
     [TestMethod]

@@ -140,7 +140,12 @@ public class Game
                 return;
             }
 
-            if (selectedPath == "south")
+            // A view, not a Path: it touches neither the Character nor the Merchant flag.
+            if (selectedPath == "character")
+            {
+                player.DisplayStats(messages);
+            }
+            else if (selectedPath == "south")
             {
                 if (merchantMet)
                 {
@@ -178,6 +183,10 @@ public class Game
             case "e":
             case "exit":
                 return "exit";
+
+            case "c":
+            case "character":
+                return "character";
 
             default:
                 return null;

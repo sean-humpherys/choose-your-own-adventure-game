@@ -244,6 +244,21 @@ public class GameTests
         Assert.IsTrue(game.IsValidPathChoice("  north  "));
     }
 
+    // --- IsValidPathChoice: viewing the Character ---
+
+    [TestMethod]
+    [DataRow("c")]
+    [DataRow("character")]
+    [DataRow("C")]
+    [DataRow("CHARACTER")]
+    [DataRow("  c  ")]
+    [DataRow("  character  ")]
+    public void IsValidPathChoice_ReturnsTrue_ForEverySpellingOfCharacter(string input)
+    {
+        Game game = new Game();
+        Assert.IsTrue(game.IsValidPathChoice(input));
+    }
+
     // --- IsValidPathChoice: numbers should be invalid ---
 
     [TestMethod]
