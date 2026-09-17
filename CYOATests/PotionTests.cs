@@ -232,15 +232,22 @@ public class PotionTests
         StringAssert.Contains(result, messages.GetMessage("stats_potion_restores") + player.Potion.HealthPointsRestored);
     }
 
+    // The character sheet names the empty slot, reversing story 11 of the Healing Potion
+    // spec for this display only; the combat display below still leaves it out.
     [TestMethod]
-    public void GetStatsDisplay_ShowsNoPotionLine_WhenNoneIsCarried()
+    [DataRow("English", "Healing Potion: none")]
+    [DataRow("Spanish", "Pocion Curativa: ninguna")]
+    [DataRow("French", "Potion de Soin: aucune")]
+    public void GetStatsDisplay_ShowsPotionNone_WhenNoneIsCarried(string language, string expectedLine)
     {
-        Messages messages = GetMessages("English");
+        Messages messages = GetMessages(language);
 
         string result = CreateTestPlayer().GetStatsDisplay(messages);
 
-        Assert.IsFalse(result.Contains(messages.GetMessage("stats_potion")),
-            "The character sheet showed an empty Potion line.");
+        CollectionAssert.Contains(result.Split(Environment.NewLine), expectedLine);
+        Assert.IsFalse(result.Contains(messages.GetMessage("stats_potion_restores")),
+            "The character sheet showed a restore line for an empty Potion slot.");
+        Assert.IsFalse(result.Contains("[stats_"), $"The {language} sheet fell back to a raw key: {result}");
     }
 
     [TestMethod]

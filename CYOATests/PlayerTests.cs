@@ -143,16 +143,37 @@ public class PlayerTests
     }
 
     [TestMethod]
-    public void GetStatsDisplay_OmitsWeaponLines_WhenNoWeapon()
+    [DataRow("English", "Weapon: long sword", "Weapon's Maximum Damage Points: 12")]
+    [DataRow("Spanish", "Arma: espada larga", "Puntos Maximos de Dano del Arma: 12")]
+    [DataRow("French", "Arme: epee longue", "Points de Dommages Maximum: 12")]
+    public void GetStatsDisplay_ShowsTheWeaponAndItsMaximumDamage_WhenCarried(
+        string language, string nameLine, string damageLine)
+    {
+        Messages messages = CreateMessages(language);
+
+        string[] lines = CreateTestPlayer().GetStatsDisplay(messages).Split(Environment.NewLine);
+
+        CollectionAssert.Contains(lines, nameLine);
+        CollectionAssert.Contains(lines, damageLine);
+    }
+
+    // Validation means a Character always carries a Weapon in play, but the slot follows the
+    // same "none" rule as the others so the summary never silently drops one.
+    [TestMethod]
+    [DataRow("English", "Weapon: none")]
+    [DataRow("Spanish", "Arma: ninguna")]
+    [DataRow("French", "Arme: aucune")]
+    public void GetStatsDisplay_ShowsWeaponNone_WhenNoWeapon(string language, string expectedLine)
     {
         Player player = CreateTestPlayer();
         player.Weapon = null;
-        Messages messages = CreateEnglishMessages();
+        Messages messages = CreateMessages(language);
 
         string result = player.GetStatsDisplay(messages);
 
-        Assert.IsFalse(result.Contains(messages.GetMessage("stats_weapon")));
+        CollectionAssert.Contains(result.Split(Environment.NewLine), expectedLine);
         Assert.IsFalse(result.Contains(messages.GetMessage("stats_damage")));
+        Assert.IsFalse(result.Contains("[stats_"), $"The {language} sheet fell back to a raw key: {result}");
     }
 
     [TestMethod]

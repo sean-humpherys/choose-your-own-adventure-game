@@ -169,10 +169,18 @@ public class Player
         output.Add(string.Format(messages.GetMessage("stats_health_of_max"), HealthPoints, MaximumHealthPoints));
         output.Add(messages.GetMessage("stats_gold") + Gold);
 
+        // Every Equipment slot is shown, filled or not, so a player can tell "I carry no Armor"
+        // from "this game has no Armor". An empty slot gets no number line: "Damage Reduction: 0"
+        // would read as a piece worth nothing. Each slot has its own "none" message so its
+        // wording can agree with that slot's noun. The combat display still omits empty slots.
         if (Weapon != null)
         {
             output.Add(messages.GetMessage("stats_weapon") + messages.TranslateWeaponForDisplay(Weapon.Type));
             output.Add(messages.GetMessage("stats_damage") + Weapon.MaxDamage);
+        }
+        else
+        {
+            output.Add(messages.GetMessage("stats_weapon") + messages.GetMessage("stats_weapon_none"));
         }
 
         if (Armor != null)
@@ -180,11 +188,19 @@ public class Player
             output.Add(messages.GetMessage("stats_armor") + messages.TranslateArmorForDisplay(Armor.Type));
             output.Add(messages.GetMessage("stats_damage_reduction") + Armor.DamageReduction);
         }
+        else
+        {
+            output.Add(messages.GetMessage("stats_armor") + messages.GetMessage("stats_armor_none"));
+        }
 
         if (Potion != null)
         {
             output.Add(messages.GetMessage("stats_potion") + messages.TranslatePotionForDisplay(Potion.Type));
             output.Add(messages.GetMessage("stats_potion_restores") + Potion.HealthPointsRestored);
+        }
+        else
+        {
+            output.Add(messages.GetMessage("stats_potion") + messages.GetMessage("stats_potion_none"));
         }
 
         return string.Join(Environment.NewLine, output);

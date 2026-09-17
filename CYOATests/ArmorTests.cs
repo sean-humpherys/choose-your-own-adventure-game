@@ -141,16 +141,22 @@ public class ArmorTests
         Assert.IsFalse(sheet.Contains("[stats_"), $"The {language} sheet fell back to a raw key: {sheet}");
     }
 
+    // An empty slot reads "none" rather than vanishing, and carries no Damage Reduction line,
+    // which under an absent Armor would read as a piece worth nothing.
     [TestMethod]
-    public void CharacterSheet_ShowsNoArmorLines_WhenNoneIsWorn()
+    [DataRow("English", "Armor: none")]
+    [DataRow("Spanish", "Armadura: ninguna")]
+    [DataRow("French", "Armure: aucune")]
+    public void CharacterSheet_ShowsArmorNone_WhenNoneIsWorn(string language, string expectedLine)
     {
         Player player = CreateTestPlayer();
-        Messages messages = GetMessages("English");
+        Messages messages = GetMessages(language);
 
         string sheet = player.GetStatsDisplay(messages);
 
-        Assert.IsFalse(sheet.Contains(messages.GetMessage("stats_armor")));
+        CollectionAssert.Contains(sheet.Split(Environment.NewLine), expectedLine);
         Assert.IsFalse(sheet.Contains(messages.GetMessage("stats_damage_reduction")));
+        Assert.IsFalse(sheet.Contains("[stats_"), $"The {language} sheet fell back to a raw key: {sheet}");
     }
 
     [TestMethod]
