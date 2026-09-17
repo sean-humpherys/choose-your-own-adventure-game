@@ -19,7 +19,7 @@ This ticket changes no production code. If a case surprises you, record what the
 
 **Blocked by:** 01 (Let tests script the rolls of both combatants)
 
-**Status:** ready-for-agent
+**Status:** ready-for-agent (implemented)
 
 - [ ] **Miss:** an Attack Roll one above the Character's Strength gives the missed narrative, leaves the Dragon's Health Points unchanged, and uses one roll.
 - [ ] **Dodge at the boundary:** an Attack Roll equal to Strength lands, and a Defense Roll equal to the Dragon's Agility dodges. The result is the dodge narrative plus the taunt picked by the Dragon's Die, with the Character's translated Race. Health Points are unchanged.

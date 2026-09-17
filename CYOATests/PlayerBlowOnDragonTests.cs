@@ -144,6 +144,7 @@ public class PlayerBlowOnDragonTests
                 messages.GetMessage("dragon_defeated_narrative")]),
             result);
         Assert.AreEqual(0, dragon.HealthPoints);
+        Assert.AreEqual(20, player.HealthPoints);
         characterDie.AssertAllRollsUsed();
         dragonDie.AssertAllRollsUsed();
     }
@@ -171,6 +172,7 @@ public class PlayerBlowOnDragonTests
                 messages.GetMessage("dragon_defeated_narrative")]),
             result);
         Assert.AreEqual(-5, dragon.HealthPoints);
+        Assert.AreEqual(20, player.HealthPoints);
         characterDie.AssertAllRollsUsed();
         dragonDie.AssertAllRollsUsed();
     }
