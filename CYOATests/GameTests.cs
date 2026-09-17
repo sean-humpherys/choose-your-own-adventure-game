@@ -244,6 +244,21 @@ public class GameTests
         Assert.IsTrue(game.IsValidPathChoice("  north  "));
     }
 
+    // --- IsValidPathChoice: viewing the Character ---
+
+    [TestMethod]
+    [DataRow("c")]
+    [DataRow("character")]
+    [DataRow("C")]
+    [DataRow("CHARACTER")]
+    [DataRow("  c  ")]
+    [DataRow("  character  ")]
+    public void IsValidPathChoice_ReturnsTrue_ForEverySpellingOfCharacter(string input)
+    {
+        Game game = new Game();
+        Assert.IsTrue(game.IsValidPathChoice(input));
+    }
+
     // --- IsValidPathChoice: numbers should be invalid ---
 
     [TestMethod]
@@ -379,4 +394,75 @@ public class GameTests
         Game game = new Game();
         Assert.IsTrue(game.IsValidCombatChoice("  a  "));
     }
+
+    // --- IsValidMerchantChoice ---
+
+    [TestMethod]
+    [DataRow("a")]
+    [DataRow("armor")]
+    [DataRow("w")]
+    [DataRow("weapon")]
+    [DataRow("n")]
+    [DataRow("nothing")]
+    public void IsValidMerchantChoice_ReturnsTrue_ForEveryAcceptedSpelling(string input)
+    {
+        Game game = new Game();
+        Assert.IsTrue(game.IsValidMerchantChoice(input));
+    }
+
+    [TestMethod]
+    [DataRow("A")]
+    [DataRow("ARMOR")]
+    [DataRow("Weapon")]
+    [DataRow("NOTHING")]
+    public void IsValidMerchantChoice_ReturnsTrue_RegardlessOfCase(string input)
+    {
+        Game game = new Game();
+        Assert.IsTrue(game.IsValidMerchantChoice(input));
+    }
+
+    [TestMethod]
+    [DataRow("  a  ")]
+    [DataRow("  armor  ")]
+    [DataRow("  w  ")]
+    [DataRow(" WEAPON ")]
+    [DataRow("  n  ")]
+    [DataRow("  nothing  ")]
+    public void IsValidMerchantChoice_ReturnsTrue_WhenPaddedWithWhitespace(string input)
+    {
+        Game game = new Game();
+        Assert.IsTrue(game.IsValidMerchantChoice(input));
+    }
+
+    [TestMethod]
+    public void IsValidMerchantChoice_ReturnsFalse_ForNull()
+    {
+        Game game = new Game();
+        Assert.IsFalse(game.IsValidMerchantChoice(null));
+    }
+
+    [TestMethod]
+    public void IsValidMerchantChoice_ReturnsFalse_ForEmpty()
+    {
+        Game game = new Game();
+        Assert.IsFalse(game.IsValidMerchantChoice(""));
+    }
+
+    [TestMethod]
+    public void IsValidMerchantChoice_ReturnsFalse_ForWhitespace()
+    {
+        Game game = new Game();
+        Assert.IsFalse(game.IsValidMerchantChoice("   "));
+    }
+
+    [TestMethod]
+    [DataRow("banana")]
+    [DataRow("buy")]
+    [DataRow("1")]
+    public void IsValidMerchantChoice_ReturnsFalse_ForJunk(string input)
+    {
+        Game game = new Game();
+        Assert.IsFalse(game.IsValidMerchantChoice(input));
+    }
+
 }

@@ -1,4 +1,4 @@
-public class Dragon
+public class Dragon : ICombatant
 {
     private readonly Die _die;
 
@@ -52,12 +52,26 @@ public class Dragon
 
     public bool AttackHits(int attackRoll)
     {
-        return attackRoll <= Strength;
+        return Blow.Lands(attackRoll, Strength);
     }
 
     public int RollDamage()
     {
         return _die.Roll(Weapon.MaxDamage);
+    }
+
+    // The target's Defense Roll against the Dragon's Blow, rolled on the Dragon's Die.
+    public int RollTargetDefense()
+    {
+        return _die.Roll(20);
+    }
+
+    // The Dragon wears no Armor and its Health Points are not floored, so a Blow that
+    // overshoots leaves them below zero. That is today's behaviour, stated here on purpose.
+    public int TakeDamage(int damage)
+    {
+        HealthPoints -= damage;
+        return damage;
     }
 
     public string Attack(Player player, Messages messages)
@@ -74,9 +88,9 @@ public class Dragon
         if (!string.IsNullOrWhiteSpace(Weapon.AsciiArt))
             output.Add(Weapon.AsciiArt);
 
-        int attackRoll = RollAttack();
+        BlowResult blow = Blow.Resolve(this, player);
 
-        if (!AttackHits(attackRoll))
+        if (blow.Outcome == BlowOutcome.Missed)
         {
             output.Add(string.Format(messages.GetMessage("dragon_missed_player"), Name, player.Name));
             return string.Join(Environment.NewLine, output);
@@ -84,24 +98,22 @@ public class Dragon
 
         output.Add(string.Format(messages.GetMessage("dragon_hit_player"), Name, player.Name));
 
-        int defenseRoll = _die.Roll(20);
-
-        if (defenseRoll <= player.Agility)
+        if (blow.Outcome == BlowOutcome.Dodged)
         {
             output.Add(string.Format(messages.GetMessage("player_defended_dragon_attack"), player.Name));
             return string.Join(Environment.NewLine, output);
         }
 
-        int damage = RollDamage();
-        player.HealthPoints -= damage;
+        // The Armor stopped the blow. This is not a dodge and must not say it was one:
+        // the Character did not evade, and conflating the two misrepresents the purchase.
+        if (blow.DamageTaken == 0)
+            output.Add(string.Format(messages.GetMessage("player_armor_absorbed"), player.Name));
+        else
+            output.Add(string.Format(messages.GetMessage("dragon_damage_dealt"), Name, blow.DamageTaken));
 
-        if (player.HealthPoints < 0)
-            player.HealthPoints = 0;
-
-        output.Add(string.Format(messages.GetMessage("dragon_damage_dealt"), Name, damage));
         output.Add(string.Format(messages.GetMessage("player_health_now"), player.Name, player.HealthPoints));
 
-        if (player.HealthPoints <= 0)
+        if (blow.TargetDefeated)
             output.Add(string.Format(messages.GetMessage("player_defeated_narrative"), player.Name));
 
         return string.Join(Environment.NewLine, output);
