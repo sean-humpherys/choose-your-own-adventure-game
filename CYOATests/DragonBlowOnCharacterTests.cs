@@ -81,7 +81,7 @@ public class DragonBlowOnCharacterTests
     [DataRow("English")]
     [DataRow("Spanish")]
     [DataRow("French")]
-    public void Attack_EqualToStrength_Lands_AndDefenseEqualToAgility_IsDefended_UsingTwoRolls(string language)
+    public void Attack_EqualToStrength_Lands_AndDefenseEqualToAgility_IsDodged_UsingTwoRolls(string language)
     {
         Messages messages = GetMessages(language);
         ScriptedDie characterDie = new ScriptedDie();
@@ -156,16 +156,20 @@ public class DragonBlowOnCharacterTests
         dragonDie.AssertAllRollsUsed();
     }
 
-    // The Armor stopping the whole blow is narrated as absorbed, never as a dodge.
+    // The Armor stopping the whole blow is narrated as absorbed, never as a dodge. A blow
+    // below the Damage Reduction must not heal the Character or be narrated as negative.
     [TestMethod]
-    [DataRow("English")]
-    [DataRow("Spanish")]
-    [DataRow("French")]
-    public void Attack_ThatArmorAbsorbsEntirely_IsNarratedAsAbsorbed_NotDefended(string language)
+    [DataRow("English", 3)]
+    [DataRow("Spanish", 3)]
+    [DataRow("French", 3)]
+    [DataRow("English", 2)]
+    [DataRow("Spanish", 2)]
+    [DataRow("French", 2)]
+    public void Attack_WhoseDamageReductionCancelsTheDamage_IsNarratedAsAbsorbed_NotDodged(string language, int damageRoll)
     {
         Messages messages = GetMessages(language);
         ScriptedDie characterDie = new ScriptedDie();
-        ScriptedDie dragonDie = DragonDie(8, 6, 3);
+        ScriptedDie dragonDie = DragonDie(8, 6, damageRoll);
         Player player = CreateCharacter(characterDie);
         player.Armor = new Armor("magical armor", 3, "[###]");
         Dragon dragon = new Dragon(dragonDie);

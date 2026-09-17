@@ -13,7 +13,7 @@ This ticket changes no production code, and it can be worked alongside ticket 02
 
 **Blocked by:** 01 (Let tests script the rolls of both combatants)
 
-**Status:** ready-for-agent
+**Status:** ready-for-agent (implemented)
 
 - [ ] **Miss:** an Attack Roll one above the Dragon's Strength gives the missed narrative, leaves the Character's Health Points unchanged, and uses one roll.
 - [ ] **Dodge at the boundary:** a Defense Roll equal to the Character's Agility gives the defended narrative, with Health Points unchanged and two rolls used.
