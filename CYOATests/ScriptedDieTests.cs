@@ -59,4 +59,27 @@ public class ScriptedDieTests
         Assert.AreEqual(11, dragon.RollAttack());
         die.AssertAllRollsUsed();
     }
+
+    [TestMethod]
+    public void Sweep_FailsTheRun_NamingTheTestThatLeftRollsUnused()
+    {
+        ScriptedDie die = new ScriptedDie(5, 6);
+        die.Roll(20);
+
+        AssertFailedException failure = Assert.ThrowsException<AssertFailedException>(
+            () => ScriptedDie.AssertNoRollsLeftUnused([die]));
+
+        StringAssert.Contains(failure.Message, nameof(Sweep_FailsTheRun_NamingTheTestThatLeftRollsUnused));
+        StringAssert.Contains(failure.Message, "6");
+    }
+
+    [TestMethod]
+    public void Sweep_SkipsADie_WhoseTestAlreadyCheckedItsRolls()
+    {
+        ScriptedDie die = new ScriptedDie(5, 6);
+        die.Roll(20);
+        Assert.ThrowsException<AssertFailedException>(() => die.AssertAllRollsUsed());
+
+        ScriptedDie.AssertNoRollsLeftUnused([die]);
+    }
 }

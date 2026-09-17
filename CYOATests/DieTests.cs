@@ -15,11 +15,15 @@ public class DieTests
     [TestMethod]
     public void Roll_TakesItsRollsFromTheSuppliedSource()
     {
-        ScriptedDie die = new ScriptedDie(7, 20, 1);
+        List<int> sidesRequested = new List<int>();
+        Die die = new Die(sides =>
+        {
+            sidesRequested.Add(sides);
+            return 4;
+        });
 
-        Assert.AreEqual(7, die.Roll(20));
-        Assert.AreEqual(20, die.Roll(20));
-        Assert.AreEqual(1, die.Roll(6));
-        die.AssertAllRollsUsed();
+        Assert.AreEqual(4, die.Roll(20));
+        Assert.AreEqual(4, die.Roll(12));
+        CollectionAssert.AreEqual(new List<int> { 20, 12 }, sidesRequested);
     }
 }
