@@ -50,6 +50,10 @@ _Avoid_: Speed, dexterity, nimbleness
 
 ### Combat
 
+**Blow**:
+One attacker's attempt to hurt one target: an Attack Roll, then a Defense Roll if it lands, then Damage if it is not dodged. A combat round holds up to two Blows, the Character's and the Dragon's; drinking the Healing Potion takes the place of the Character's.
+_Avoid_: Hit (a hit is only a successful Attack Roll), strike, turn, exchange
+
 **Attack Roll**:
 The roll that decides whether a blow lands, measured against the attacker's Strength.
 _Avoid_: To-hit, hit check
