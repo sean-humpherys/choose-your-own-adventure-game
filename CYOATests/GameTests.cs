@@ -73,6 +73,27 @@ public class GameTests
         game.EndGame(false, true, GetMessages("French"));
     }
 
+    [TestMethod]
+    public void EndGame_DoesNotThrow_WhenPlayerWinsInItalian()
+    {
+        Game game = new Game();
+        game.EndGame(true, false, GetMessages("Italian"));
+    }
+
+    [TestMethod]
+    public void EndGame_DoesNotThrow_WhenPlayerLosesInItalian()
+    {
+        Game game = new Game();
+        game.EndGame(false, false, GetMessages("Italian"));
+    }
+
+    [TestMethod]
+    public void EndGame_DoesNotThrow_WhenPlayerRetreatsInItalian()
+    {
+        Game game = new Game();
+        game.EndGame(false, true, GetMessages("Italian"));
+    }
+
     // --- IsValidMenuChoice ---
 
     [TestMethod]
@@ -378,5 +399,58 @@ public class GameTests
     {
         Game game = new Game();
         Assert.IsTrue(game.IsValidCombatChoice("  a  "));
+    }
+
+    // --- GetLanguageFromChoice ---
+
+    [TestMethod]
+    public void GetLanguageFromChoice_ReturnsEnglish_ForOne()
+    {
+        Game game = new Game();
+        Assert.AreEqual("English", game.GetLanguageFromChoice("1"));
+    }
+
+    [TestMethod]
+    public void GetLanguageFromChoice_ReturnsSpanish_ForTwo()
+    {
+        Game game = new Game();
+        Assert.AreEqual("Spanish", game.GetLanguageFromChoice("2"));
+    }
+
+    [TestMethod]
+    public void GetLanguageFromChoice_ReturnsFrench_ForThree()
+    {
+        Game game = new Game();
+        Assert.AreEqual("French", game.GetLanguageFromChoice("3"));
+    }
+
+    [TestMethod]
+    public void GetLanguageFromChoice_ReturnsItalian_ForFour()
+    {
+        Game game = new Game();
+        Assert.AreEqual("Italian", game.GetLanguageFromChoice("4"));
+    }
+
+    [TestMethod]
+    public void GetLanguageFromChoice_ReturnsItalian_ForPaddedFour()
+    {
+        Game game = new Game();
+        Assert.AreEqual("Italian", game.GetLanguageFromChoice("  4  "));
+    }
+
+    [TestMethod]
+    public void GetLanguageFromChoice_ReturnsEnglish_ForInvalidInput()
+    {
+        Game game = new Game();
+        Assert.AreEqual("English", game.GetLanguageFromChoice("9"));
+        Assert.AreEqual("English", game.GetLanguageFromChoice("abc"));
+    }
+
+    [TestMethod]
+    public void GetLanguageFromChoice_ReturnsEnglish_ForNullOrEmpty()
+    {
+        Game game = new Game();
+        Assert.AreEqual("English", game.GetLanguageFromChoice(null));
+        Assert.AreEqual("English", game.GetLanguageFromChoice(""));
     }
 }

@@ -126,6 +126,40 @@ public class DragonTests
 
         Assert.IsTrue(player.HealthPoints >= 0);
     }
+
+    // Regression: the claws ASCII art used to show the English word "claws" in every language
+
+    [TestMethod]
+    public void Attack_ShowsItalianWeaponNameInAsciiArt()
+    {
+        Die die = new Die();
+        Dragon dragon = new Dragon(die);
+        Player player = new Player { Name = "TestHero", Agility = 10, HealthPoints = 30 };
+
+        string result = dragon.Attack(player, GetMessages("Italian"));
+
+        StringAssert.Contains(result, "<<< artigli >>>");
+        Assert.IsFalse(result.Contains("claws"), "Italian attack output should not contain the English word 'claws'.");
+    }
+
+    [TestMethod]
+    public void Attack_ShowsTranslatedWeaponNameInAsciiArt_ForEachLanguage()
+    {
+        string[] languages = { "English", "Spanish", "French", "Italian" };
+
+        foreach (string language in languages)
+        {
+            Die die = new Die();
+            Dragon dragon = new Dragon(die);
+            Player player = new Player { Name = "TestHero", Agility = 10, HealthPoints = 30 };
+            Messages messages = GetMessages(language);
+
+            string result = dragon.Attack(player, messages);
+
+            string expectedArt = $"<<< {messages.TranslateWeaponForDisplay("claws")} >>>";
+            StringAssert.Contains(result, expectedArt, $"{language} attack output is missing '{expectedArt}'.");
+        }
+    }
 }
 
 [TestClass]

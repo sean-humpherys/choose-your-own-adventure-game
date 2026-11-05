@@ -71,8 +71,9 @@ public class Dragon
             messages.TranslateWeaponForDisplay(Weapon.Type)
         ));
 
+        // The art contains the weapon's internal name (e.g. "<<< claws >>>"), so swap in the translated name
         if (!string.IsNullOrWhiteSpace(Weapon.AsciiArt))
-            output.Add(Weapon.AsciiArt);
+            output.Add(Weapon.AsciiArt.Replace(Weapon.Type, messages.TranslateWeaponForDisplay(Weapon.Type)));
 
         int attackRoll = RollAttack();
 
