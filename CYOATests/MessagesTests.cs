@@ -272,4 +272,98 @@ public class MessagesTests
         messages.ReadDictionary();
         Assert.AreEqual("Fighter", messages.NormalizeOccupation("FIGHTER"));
     }
+
+    // --- Italian ---
+
+    private static Messages LoadItalian()
+    {
+        Messages messages = new Messages();
+        messages.SetCurrentLanguage("Italian");
+        messages.ReadDictionary();
+        return messages;
+    }
+
+    [TestMethod]
+    public void SetCurrentLanguage_SetsLanguageToItalian()
+    {
+        Messages messages = new Messages();
+        messages.SetCurrentLanguage("Italian");
+        Assert.AreEqual("Italian", messages.CurrentLanguage);
+    }
+
+    [TestMethod]
+    public void ReadDictionary_LoadsItalianWelcomeMessage()
+    {
+        Messages messages = LoadItalian();
+        Assert.AreEqual("Italian", messages.CurrentLanguage, "Italian should not fall back to English.");
+        Assert.AreEqual("Benvenuto nel Gioco Scegli la Tua Avventura", messages.GetMessage("welcome"));
+        Assert.AreEqual("Arrivederci!", messages.GetMessage("goodbye"));
+    }
+
+    [TestMethod]
+    public void ReadDictionary_AllRequiredKeysExistInItalian()
+    {
+        Messages messages = LoadItalian();
+
+        string[] requiredKeys = { "welcome", "menu",
+                                   "choose_path", "path_north", "path_south", "attack_prompt",
+                                   "victory", "defeat", "retreat", "invalid", "goodbye" };
+
+        foreach (string key in requiredKeys)
+        {
+            string result = messages.GetMessage(key);
+            Assert.AreNotEqual($"[{key}]", result, $"Key '{key}' is missing from Italian dictionary.");
+        }
+    }
+
+    [TestMethod]
+    public void Italian_RaceInput_IsValidAndNormalized()
+    {
+        Messages messages = LoadItalian();
+        Assert.IsTrue(messages.IsValidRace("Mezzuomo"));
+        Assert.AreEqual("Halfling", messages.NormalizeRace("mezzuomo"));
+        Assert.AreEqual("Elf", messages.NormalizeRace("ELFO"));
+        Assert.IsFalse(messages.IsValidRace("Halfling"), "English race names should not be accepted in Italian.");
+    }
+
+    [TestMethod]
+    public void Italian_OccupationInput_IsValidAndNormalized()
+    {
+        Messages messages = LoadItalian();
+        Assert.IsTrue(messages.IsValidOccupation("Arciere"));
+        Assert.AreEqual("Thief", messages.NormalizeOccupation("ladro"));
+    }
+
+    [TestMethod]
+    public void Italian_DisplayNames_AreTranslated()
+    {
+        Messages messages = LoadItalian();
+        Assert.AreEqual("Mezzuomo", messages.TranslateRaceForDisplay("Halfling"));
+        Assert.AreEqual("Guerriero", messages.TranslateOccupationForDisplay("Fighter"));
+        Assert.AreEqual("spada lunga", messages.TranslateWeaponForDisplay("long sword"));
+        Assert.AreEqual("artigli", messages.TranslateWeaponForDisplay("claws"));
+    }
+
+    // Guards every language (including Italian) against missing translations:
+    // each language must have every message key that English has.
+    [TestMethod]
+    [DataRow("Spanish")]
+    [DataRow("French")]
+    [DataRow("Italian")]
+    public void Language_HasEveryEnglishMessageKey(string language)
+    {
+        string jsonPath = Path.Combine(AppContext.BaseDirectory, "language_data.json");
+        using System.Text.Json.JsonDocument doc = System.Text.Json.JsonDocument.Parse(File.ReadAllText(jsonPath));
+        var root = doc.RootElement;
+
+        Assert.IsTrue(root.TryGetProperty(language, out var section), $"{language} section is missing.");
+
+        var englishKeys = root.GetProperty("English").GetProperty("dictionary")
+            .EnumerateObject().Select(p => p.Name);
+        var languageKeys = section.GetProperty("dictionary")
+            .EnumerateObject().Select(p => p.Name).ToHashSet();
+
+        var missing = englishKeys.Where(k => !languageKeys.Contains(k)).ToList();
+        Assert.AreEqual(0, missing.Count, $"{language} is missing: {string.Join(", ", missing)}");
+    }
 }

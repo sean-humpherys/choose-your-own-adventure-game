@@ -73,6 +73,44 @@ public class GameTests
         game.EndGame(false, true, GetMessages("French"));
     }
 
+    [TestMethod]
+    public void EndGame_DoesNotThrow_WhenPlayerWinsInItalian()
+    {
+        Game game = new Game();
+        game.EndGame(true, false, GetMessages("Italian"));
+    }
+
+    [TestMethod]
+    public void EndGame_DoesNotThrow_WhenPlayerLosesInItalian()
+    {
+        Game game = new Game();
+        game.EndGame(false, false, GetMessages("Italian"));
+    }
+
+    [TestMethod]
+    public void EndGame_DoesNotThrow_WhenPlayerRetreatsInItalian()
+    {
+        Game game = new Game();
+        game.EndGame(false, true, GetMessages("Italian"));
+    }
+
+    // --- GetLanguageFromChoice ---
+
+    [TestMethod]
+    [DataRow("1", "English")]
+    [DataRow("2", "Spanish")]
+    [DataRow("3", "French")]
+    [DataRow("4", "Italian")]
+    [DataRow(" 4 ", "Italian")]
+    [DataRow("9", "English")]
+    [DataRow("", "English")]
+    [DataRow(null, "English")]
+    public void GetLanguageFromChoice_MapsMenuNumberToLanguage(string? input, string expected)
+    {
+        Game game = new Game();
+        Assert.AreEqual(expected, game.GetLanguageFromChoice(input));
+    }
+
     // --- IsValidMenuChoice ---
 
     [TestMethod]
