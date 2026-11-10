@@ -272,4 +272,145 @@ public class MessagesTests
         messages.ReadDictionary();
         Assert.AreEqual("Fighter", messages.NormalizeOccupation("FIGHTER"));
     }
+
+    // --- Safety before loading ---
+
+    [TestMethod]
+    public void TranslateMethods_BeforeReadDictionary_ReturnInputInsteadOfCrashing()
+    {
+        Messages messages = new Messages();
+        Assert.AreEqual("Elf", messages.TranslateRaceForDisplay("Elf"));
+        Assert.AreEqual("Fighter", messages.TranslateOccupationForDisplay("Fighter"));
+        Assert.AreEqual("dagger", messages.TranslateWeaponForDisplay("dagger"));
+    }
+
+    // --- Language fallback and reload ---
+
+    [TestMethod]
+    public void ReadDictionary_UnknownLanguage_FallsBackToEnglish()
+    {
+        Messages messages = new Messages();
+        messages.SetCurrentLanguage("Klingon");
+        messages.ReadDictionary();
+
+        Assert.AreEqual("English", messages.CurrentLanguage);
+        Assert.AreEqual("Welcome to Choose Your Adventure Game", messages.GetMessage("welcome"));
+    }
+
+    [TestMethod]
+    public void SetCurrentLanguage_AfterLoading_ReloadsTextAutomatically()
+    {
+        Messages messages = new Messages();
+        messages.ReadDictionary();                 // English
+        messages.SetCurrentLanguage("Spanish");    // no second ReadDictionary call
+
+        Assert.AreEqual("Bienvenido al Juego de Elige Tu Aventura", messages.GetMessage("welcome"));
+    }
+
+    // --- Input handling ---
+
+    [TestMethod]
+    public void IsValidRace_IgnoresSurroundingSpaces()
+    {
+        Messages messages = new Messages();
+        messages.ReadDictionary();
+        Assert.IsTrue(messages.IsValidRace("  elf  "));
+    }
+
+    [TestMethod]
+    public void NormalizeRace_UnknownInput_ReturnsTrimmedInput()
+    {
+        Messages messages = new Messages();
+        messages.ReadDictionary();
+        Assert.AreEqual("Orc", messages.NormalizeRace("  Orc  "));
+    }
+
+    [TestMethod]
+    public void NormalizeOccupation_UnknownInput_ReturnsTrimmedInput()
+    {
+        Messages messages = new Messages();
+        messages.ReadDictionary();
+        Assert.AreEqual("Wizard", messages.NormalizeOccupation("  Wizard  "));
+    }
+
+    // --- Clear errors for a broken language file ---
+
+    [TestMethod]
+    public void ReadDictionary_MissingFile_ThrowsClearError()
+    {
+        Messages messages = new Messages(Path.Combine(Path.GetTempPath(), "does_not_exist_cyoa.json"));
+        var ex = Assert.ThrowsException<InvalidOperationException>(() => messages.ReadDictionary());
+        StringAssert.Contains(ex.Message, "not found");
+    }
+
+    [TestMethod]
+    public void ReadDictionary_MalformedJson_ThrowsClearError()
+    {
+        string path = WriteTempJson("{ this is not json");
+        try
+        {
+            var ex = Assert.ThrowsException<InvalidOperationException>(() => new Messages(path).ReadDictionary());
+            StringAssert.Contains(ex.Message, "not valid JSON");
+        }
+        finally { File.Delete(path); }
+    }
+
+    [TestMethod]
+    public void ReadDictionary_MissingSection_ThrowsClearError()
+    {
+        string path = WriteTempJson("""{ "English": { "dictionary": { "welcome": "Hi" } } }""");
+        try
+        {
+            var ex = Assert.ThrowsException<InvalidOperationException>(() => new Messages(path).ReadDictionary());
+            StringAssert.Contains(ex.Message, "raceMap");
+        }
+        finally { File.Delete(path); }
+    }
+
+    // --- Every language has the same keys as English ---
+
+    [TestMethod]
+    public void LanguageFile_EveryLanguageHasSameKeysAsEnglish()
+    {
+        string json = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "language_data.json"));
+        using var doc = System.Text.Json.JsonDocument.Parse(json);
+        var root = doc.RootElement;
+
+        string[] sections = { "dictionary", "raceMap", "occupationMap",
+                              "displayRaceMap", "displayOccupationMap", "displayWeaponMap" };
+
+        foreach (string section in sections)
+        {
+            // raceMap/occupationMap keys are what the player types, so they differ by
+            // language; only the number of entries needs to match for those.
+            bool compareKeyNames = section != "raceMap" && section != "occupationMap";
+            var englishKeys = root.GetProperty("English").GetProperty(section)
+                                  .EnumerateObject().Select(p => p.Name).ToHashSet();
+
+            foreach (var language in root.EnumerateObject().Where(l => l.Name != "English"))
+            {
+                var keys = language.Value.GetProperty(section)
+                                   .EnumerateObject().Select(p => p.Name).ToHashSet();
+
+                if (compareKeyNames)
+                {
+                    var missing = englishKeys.Except(keys).ToList();
+                    Assert.AreEqual(0, missing.Count,
+                        $"{language.Name}.{section} is missing: {string.Join(", ", missing)}");
+                }
+                else
+                {
+                    Assert.AreEqual(englishKeys.Count, keys.Count,
+                        $"{language.Name}.{section} has a different number of entries than English.");
+                }
+            }
+        }
+    }
+
+    private static string WriteTempJson(string content)
+    {
+        string path = Path.Combine(Path.GetTempPath(), $"cyoa_test_{Guid.NewGuid():N}.json");
+        File.WriteAllText(path, content);
+        return path;
+    }
 }
